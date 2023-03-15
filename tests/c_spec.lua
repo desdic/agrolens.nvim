@@ -19,7 +19,7 @@ describe("c", function()
         local entries = lens._get_captures({commands={"functions"}, buffers=buffers})
 
         -- We should have found 3 functions
-        assert.equals(#entries, 2)
+        assert.equals(#entries, 3)
 
         assert.equals("void myfunc() {", entries[1].line)
         assert.equals("functions", entries[1].rcapture.capture)
@@ -27,10 +27,15 @@ describe("c", function()
         assert.equals("functions", entries[1].rname.capture)
         assert.equals("myfunc", entries[1].rname.match)
 
-        assert.equals("int main() {", entries[2].line)
+        assert.equals("struct mystruct *myfunc2() {", entries[2].line)
         assert.equals("functions", entries[2].rcapture.capture)
         assert.equals("functions", entries[2].rname.capture)
-        assert.equals("main", entries[2].rname.match)
+        assert.equals("myfunc2", entries[2].rname.match)
+
+        assert.equals("int main() {", entries[3].line)
+        assert.equals("functions", entries[3].rcapture.capture)
+        assert.equals("functions", entries[3].rname.capture)
+        assert.equals("main", entries[3].rname.match)
 
     end)
 end)
