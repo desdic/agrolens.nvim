@@ -22,7 +22,7 @@ M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
         M.log.debug("got", line_text, to, torow)
 
         -- if multiline and its the capture line just include the line
-        if to ~= torow and curr_capture_name == "rcapture" then
+        if to ~= torow and curr_capture_name == "agrolens.scope" then
             from = 0
             to = -1
         end
@@ -47,7 +47,7 @@ M._add_entries = function(entries, capture_names, bufnr, filename, filetype)
         local root = trees[1]:root()
 
         for _, capture_name in ipairs(capture_names) do
-            local okgetq, iter_query = pcall(queries.get_query, filetype, capture_name)
+            local okgetq, iter_query = pcall(queries.get_query, filetype, "agrolens." .. capture_name)
             if okgetq and iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = M._create_entry(filename, matches, iter_query, bufnr, capture_name)
@@ -85,11 +85,11 @@ M._generate_new_finder = function(opts)
             })
             local make_display = function()
                 return displayer({
-                    trim_string(entry.rcapture.rawline), vim.fs.basename(entry.filename), tostring(entry.row),
-                    entry.rcapture.capture_name
+                    trim_string(entry["agrolens.scope"].rawline), vim.fs.basename(entry.filename), tostring(entry.row),
+                    entry["agrolens.scope"].capture_name
                 })
             end
-            local ordinal = entry.rcapture.rawline .. ":" .. entry.filename
+            local ordinal = entry["agrolens.scope"].rawline .. ":" .. entry.filename
             return {
                 value = entry,
                 ordinal = ordinal,
