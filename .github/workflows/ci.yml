@@ -49,6 +49,6 @@ jobs:
         run: |
           export PATH="${PWD}/_neovim/bin:${PATH}"
           export VIM="${PWD}/_neovim/share/nvim/runtime"
-          nvim --headless -c "TSInstall lua" -c "q"
+          nvim --headless -c "TSInstall lua c cpp" -c "q"
           nvim --version
           make test
