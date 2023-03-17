@@ -2,9 +2,11 @@
 
 ![Test](https://github.com/desdic/agrolens.nvim/actions/workflows/ci.yml/badge.svg)
 
+![Agrolens](media/agrolens.png "Agrolens")
+
 # What is Agrolens
 
-Its an extention to telescope that runs pre-defined (or custom) treesitter queries on a buffer (or all buffers) and gives a quick view via telescope
+Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
 
 ## Requirements
 
@@ -14,9 +16,9 @@ Its an extention to telescope that runs pre-defined (or custom) treesitter queri
 
 [Plenary](https://github.com/nvim-lua/plenary.nvim)
 
-[Nvim treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+[Nvim tree-sitter](https://github.com/nvim-treesitter/nvim-treesitter)
 
-And the language you with to use is also required to be installed via Nvim treesitter
+And the language you with to use is also required to be installed via Nvim tree-sitter
 
 # Installation
 
@@ -39,7 +41,9 @@ require "telescope".load_extension("agrolens")
 ```lua
 require("telescope").extensions = {
     agrolens = {
-       debug = false
+       debug = false,
+       sametype = true,
+       includehiddenbuffers=false,
     }
 }
 ```
@@ -54,24 +58,54 @@ require("telescope").extensions = {
 
 | Parameter | Value(s) | Description |
 | --- | ---| ----------- |
-| commands | functions,methods | A comma seperated list with queries you want to run |
+| query | functions,methods | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
 | includehiddenbuffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
+| sametype | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
+| match | name and string | Matches a variable (minus the agrolens namespace) from the query with a string. If no string is provided its the word where the cursor is |
+
+Examples
+
+Use queries from `agrolens.functions` and `agrolens.variables`
+```
+:Telescope agrolens query=functions,variables
+```
+
+Use query functions but run it on all buffers regards filetype
+```
+:Telescope agrolens query=functions buffers=all
+```
+
+Use query functions but run it on all buffers regards filetype and include hidden buffers. Some files are pre-loaded
+due to to provide LSP/tree-sitter and you can search in those too
+```
+:Telescope agrolens query=functions buffers=all includehiddenbuffers=true
+```
+
+Use query functions on all buffers but only if the `agrolens.name` matches the word on the cursor
+```
+:Telescope agrolens query=functions buffers=all match=name
+```
+
+Same query as above but `agrolens.name` must by either main or myfunc
+```
+:Telescope agrolens query=functions buffers=all match=name=main,name=myfunc
+```
+
+## Custom queries
+
+You can place your custom queries in `~/.config/nvim/queries` you can load them just as with the build-in queries. So adding `myspecial.scm` as `~/.config/nvim/queries/c/myspecial.scm` enables you to run
 
 ```
-:Telescope agrolens commands=functions,methods
+:Telescope agrolens query=myspecial
 ```
 
-```
-:Telescope agrolens commands=functions buffers=all
-```
+# Credit
 
-```
-:Telescope agrolens commands=functions buffers=all includehiddenbuffers=true
-```
+I absolute love [ziontee113/neo-minimap](https://github.com/ziontee113/neo-minimap) and this is where the idea to this plugin started. But I don't think writing tree-sitter queries and wanted to provide a solid (yes, it makes it opinionated) set of queries and still support custom queries.
 
 # Help wanted
 
-I don't use all supported languages and files supported by treesitter but if you do and want to contribute please make a MR
+I don't use all supported languages and files supported by tree-sitter but if you do and want to contribute please make a MR
 
 See the [CONTRIBUTING](CONTRIBUTING.md) for details.

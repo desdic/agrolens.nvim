@@ -1,10 +1,10 @@
-describe("c", function()
+describe("lua", function()
 
     local lens = nil
     local buffers = nil
 
     it("load", function()
-        vim.cmd.edit("tests/c/test.c")
+        vim.cmd.edit("tests/lua/test.lua")
         buffers = vim.api.nvim_list_bufs()
         assert.equal(#buffers, 1)
 
@@ -18,11 +18,14 @@ describe("c", function()
     it("functions", function()
         local entries = lens.get_captures({queries={"functions"}, bufids=buffers})
 
-        -- We should have found 3 functions
-        assert.equals(#entries, 3)
+        -- functions
+        assert.equals(#entries, 5)
+        assert.equals("tests/lua/test.lua:1:0:local hello1 = function()", entries[1])
+        assert.equals("tests/lua/test.lua:5:0:hello2 = function()", entries[2])
+        assert.equals("tests/lua/test.lua:9:0:function hello3()", entries[3])
 
-        assert.equals("tests/c/test.c:7:0:void myfunc() {", entries[1])
-        assert.equals("tests/c/test.c:11:0:struct mystruct *myfunc2() {", entries[2])
-        assert.equals("tests/c/test.c:15:0:int main() {", entries[3])
+        -- methods
+        assert.equals("tests/lua/test.lua:15:0:M.hello4 = function()", entries[4])
+        assert.equals("tests/lua/test.lua:19:0:function M.hello5()", entries[5])
     end)
 end)
