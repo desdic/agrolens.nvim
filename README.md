@@ -1,5 +1,3 @@
-# Agrolens
-
 ![Test](https://github.com/desdic/agrolens.nvim/actions/workflows/ci.yml/badge.svg)
 
 ![Agrolens](media/agrolens.png "Agrolens")
