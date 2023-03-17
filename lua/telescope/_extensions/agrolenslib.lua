@@ -2,22 +2,36 @@ local M = {}
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
-local queries = require("nvim-treesitter.query")
 local make_entry = require("telescope.make_entry")
+local actions = require("telescope.actions")
 local conf = require("telescope.config").values
-local entry_display = require("telescope.pickers.entry_display")
+local queries = require("nvim-treesitter.query")
+local ppath = require("plenary.path")
 
-local function trim_string(s) return s:match("^%s*(.-)%s*$") end
+---@brief [[
+--- Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
+---@brief ]]
 
-M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
+---@tag agrolens.nvim
+---@config { ["name"] = "INTRODUCTION"}
+
+local function ltrim(s) return s:gsub("^%s*", "") end
+
+--- Create an entry
+---@param filename string
+---@param matches table
+---@param iter_query type
+---@param bufnr type
+---@param capture_name string
+M.create_entry = function(filename, matches, iter_query, bufnr, capture_name)
     local entry = {}
     entry.filename = filename
     entry.bufnr = bufnr
 
     for i, _ in pairs(matches) do
         local curr_capture_name = iter_query.captures[i]
-        local row, from, torow, to = matches[i]:range()
-        local line_text = vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false)[1]
+        local lnum, from, torow, to = matches[i]:range()
+        local line_text = vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1]
 
         M.log.debug("got", line_text, to, torow)
 
@@ -29,17 +43,43 @@ M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
 
         if not entry[curr_capture_name] then entry[curr_capture_name] = {} end
 
-        entry[curr_capture_name].rawline = trim_string(line_text)
-        entry[curr_capture_name].match = string.sub(line_text, from+1, to)
+        entry[curr_capture_name].match = string.sub(line_text, from + 1, to)
         entry[curr_capture_name].capture = capture_name
 
-        entry.row = row + 1
+        entry.lnum = lnum + 1
+        entry.col = from + (string.len(line_text) - string.len(ltrim(line_text)))
         entry.line = line_text
     end
     return entry
 end
 
-M._add_entries = function(entries, capture_names, bufnr, filename, filetype)
+local format_entry = function(entry)
+    return string.format("%s:%d:%d:%s", entry.filename, entry.lnum, entry.col, entry.line)
+end
+
+local does_match = function(opts, entry)
+    -- no matches defined
+    if not opts.matches then return true end
+
+    for _, match in ipairs(opts.matches) do
+        local n = "agrolens." .. match.name
+        if entry[n] then
+            -- only one has to match (or and not and)
+            if match.word == entry[n].match then return true end
+        end
+    end
+
+    return false
+end
+
+--- Add entries if they match
+---@param opts table
+---@param entries table
+---@param capture_names table
+---@param bufnr type
+---@param filename string
+---@param filetype string
+M.add_entries = function(opts, entries, capture_names, bufnr, filename, filetype)
     local ts = vim.treesitter
     local ok, tsparser = pcall(ts.get_parser, bufnr, filetype)
     if ok and tsparser and type(tsparser) ~= "string" then
@@ -50,8 +90,9 @@ M._add_entries = function(entries, capture_names, bufnr, filename, filetype)
             local okgetq, iter_query = pcall(queries.get_query, filetype, "agrolens." .. capture_name)
             if okgetq and iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
-                    local entry = M._create_entry(filename, matches, iter_query, bufnr, capture_name)
-                    table.insert(entries, entry)
+                    local entry = M.create_entry(filename, matches, iter_query, bufnr, capture_name)
+
+                    if does_match(opts, entry) then table.insert(entries, format_entry(entry)) end
                 end
             end
         end
@@ -59,114 +100,153 @@ M._add_entries = function(entries, capture_names, bufnr, filename, filetype)
     return entries
 end
 
-M._get_captures = function(opts)
+--- Get captures from query
+---@param opts
+M.get_captures = function(opts)
     local entries = {}
 
-    for _, bufnr in ipairs(opts.buffers) do
+    for _, bufnr in ipairs(opts.bufids) do
         if vim.fn.getbufinfo(bufnr)[1].hidden == 0 then
             local buffilename = vim.api.nvim_buf_get_name(bufnr)
+            local relpath = ppath:new(buffilename):make_relative(opts.cwd)
             local filetype = vim.filetype.match({buf = bufnr})
 
             if filetype and filetype ~= "" then
-                entries = M._add_entries(entries, opts.commands, bufnr, buffilename, filetype)
+                entries = M.add_entries(opts, entries, opts.queries, bufnr, relpath, filetype)
             end
         end
     end
     return entries
 end
 
-M._generate_new_finder = function(opts)
-    return finders.new_table({
-        results = M._get_captures(opts),
-        entry_maker = function(entry)
-            local displayer = entry_display.create({
-                separator = ":",
-                items = {{width = 80}, {remaining = false}, {remaining = true}}
-            })
-            local make_display = function()
-                return displayer({
-                    trim_string(entry["agrolens.scope"].rawline), vim.fs.basename(entry.filename), tostring(entry.row),
-                    entry["agrolens.scope"].capture_name
-                })
-            end
-            local ordinal = entry["agrolens.scope"].rawline .. ":" .. entry.filename
-            return {
-                value = entry,
-                ordinal = ordinal,
-                display = make_display,
-                lnum = entry.row,
-                col = entry.col,
-                bufnr = entry.bufnr,
-                filename = entry.filename
-            }
-        end
-    })
+--- Generate a new finder for telescope
+---@param opts table
+M.generate_new_finder = function(opts)
+    return finders.new_table({results = M.get_captures(opts), entry_maker = opts.entry_maker})
 end
 
-M._make_bufferlist = function(opts)
+-- Make a list of buffers to use
+---@param opts table
+M.make_bufferlist = function(opts)
     local buffers = {}
 
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if opts.includehiddenbuffers == false then
-            if vim.fn.getbufinfo(bufnr)[1].listed == 1 then
+        if opts.sametype == false or vim.filetype.match({buf = bufnr}) == opts.cur_type then
+            if opts.includehiddenbuffers == false then
+                if vim.fn.getbufinfo(bufnr)[1].listed == 1 then table.insert(buffers, bufnr) end
+            else
                 table.insert(buffers, bufnr)
             end
-        else
-            table.insert(buffers, bufnr)
         end
     end
     return buffers
 end
 
-M._param_to_opts = function(args, opts)
+local function split(source, delimiters)
+    local elements = {}
+    local pattern = "([^" .. delimiters .. "]+)"
+    --- Keep linter happy
+    local _ = string.gsub(source, pattern, function(value) elements[#elements + 1] = value end)
+    return elements
+end
 
-    local commands = {}
-    if args.commands then
-        for command in args.commands:gmatch('[^,%s]+') do
-            table.insert(commands, command)
-        end
-    end
-    opts.commands = commands
-    M.log.debug("commands", commands)
+local function matchstr(...)
+    local ok, ret = pcall(vim.fn.matchstr, ...)
+    return ok and ret or ""
+end
 
-    local includehiddenbuffers = false
-    if args.includehiddenbuffers and args.includehiddenbuffers==true then
-        includehiddenbuffers = true
-    end
+local function get_word_at_cursor()
+    local column = vim.api.nvim_win_get_cursor(0)[2]
+    local line = vim.api.nvim_get_current_line()
+
+    local left = matchstr(line:sub(1, column + 1), [[\k*$]])
+    local right = matchstr(line:sub(column + 1), [[^\k*]]):sub(2)
+
+    return left .. right
+end
+
+-- Setup default values and in correct format
+---@param opts table
+M.sanitize_opts = function(opts)
+    local querylist = {}
+    if opts.query then for query in opts.query:gmatch("[^,%s]+") do table.insert(querylist, query) end end
+    opts.queries = querylist
+
+    local includehiddenbuffers = M.telescope_config.includehiddenbuffers or false
+    if opts.includehiddenbuffers == true then includehiddenbuffers = true end
     opts.includehiddenbuffers = includehiddenbuffers
-    M.log.debug("includehiddenbuffers", includehiddenbuffers)
 
-    local curbuf = vim.api.nvim_get_current_buf()
+    local sametype = M.telescope_config.sametype
+    if opts.sametype == false then sametype = false end
+    opts.sametype = sametype
 
-    local buffers = {curbuf}
-    if args.buffers and type(args.buffers) == "string" then
-        if args.buffers == "all" then
-            buffers[curbuf] = nil
-            buffers = M._make_bufferlist(opts)
+    local matches = {}
+    if opts.match then
+        local current_work = get_word_at_cursor()
+
+        for match in opts.match:gmatch("[^,%s]+") do
+            local elements = split(match, "=")
+
+            if #elements == 1 then table.insert(elements, current_work) end
+
+            local entry = {}
+            entry.name = elements[1]
+            entry.word = elements[2]
+
+            table.insert(matches, entry)
         end
     end
-    opts.buffers = buffers
-    M.log.debug("buffers", buffers)
+
+    if #matches > 0 then opts.matches = matches end
 
     return opts
 end
 
-M.setup = function(log)
-    M.log = log
+-- Find available buffers
+---@param opts table
+M.get_buffers = function(opts)
+    local curbuf = vim.api.nvim_get_current_buf()
+
+    opts.cur_type = vim.filetype.match({buf = curbuf})
+
+    local bufids = {curbuf}
+    if opts.buffers and type(opts.buffers) == "string" then
+        if opts.buffers == "all" then
+            bufids[curbuf] = nil
+            bufids = M.make_bufferlist(opts)
+        end
+    end
+    opts.bufids = bufids
+
+    return opts
 end
 
-M.run = function(args)
-    local opts = {}
+-- Setup with a logging instance
+---@param log type
+M.setup = function(log) M.log = log end
 
-    opts.entry_maker = opts.entry_maker or make_entry.gen_from_file(opts)
+-- Invoke telescope
+---@param opts table
+M.run = function(opts)
+    opts = opts or {}
 
-    opts = M._param_to_opts(args, opts)
+    opts.entry_maker = opts.entry_maker or make_entry.gen_from_vimgrep(opts)
+    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+    opts.previewer = opts.previewer or conf.grep_previewer(opts)
+    opts.sorter = opts.sorter or conf.generic_sorter(opts)
+    opts = M.sanitize_opts(opts)
+    opts = M.get_buffers(opts)
+    M.log.debug("opts", opts)
 
     pickers.new(opts, {
         prompt_title = "Search",
-        finder = M._generate_new_finder(opts),
-        previewer = conf.grep_previewer(opts),
-        sorter = conf.generic_sorter(opts)
+        finder = M.generate_new_finder(opts),
+        previewer = opts.previewer,
+        sorter = opts.sorter,
+        attach_mappings = function(_, map)
+            map("i", "<c-space>", actions.to_fuzzy_refine)
+            return true
+        end
     }):find()
 end
 

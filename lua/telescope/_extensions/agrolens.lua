@@ -12,11 +12,13 @@ local agrolens = require("telescope._extensions.agrolenslib")
 local log = plenary.log.new({plugin = "agrolens", level = "info"})
 
 local setup = function(ext_config, _)
-    local config = vim.F.if_nil(ext_config, {patterns = {".git"}})
+    local config = vim.F.if_nil(ext_config, {debug = false})
 
     -- redefine log if debug enabled
     if vim.F.if_nil(config.debug, false) then log = plenary.log.new({plugin = "agrolens", level = "debug"}) end
-    agrolens.log = log
+    agrolens.setup(log)
+
+    agrolens.telescope_config = ext_config
 end
 
 return telescope.register_extension({setup = setup, exports = {agrolens = function(opts) agrolens.run(opts) end}})
