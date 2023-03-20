@@ -9,6 +9,6 @@ vim.o.swapfile = false
 vim.bo.swapfile = false
 
 require("nvim-treesitter.configs").setup {
-  indent = { enable = true },
-  highlight = { enable = true },
+    indent = { enable = true },
+    highlight = { enable = true },
 }
