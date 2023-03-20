@@ -1,0 +1,32 @@
+================================================================================
+INTRODUCTION                                                     *agrolens.nvim*
+
+Its an extention for telescope that runs pre-defined (or custom) tree-sitter
+queries on a buffer (or all buffers) and gives a quick view via telescope
+
+M.generate_new_finder({opts})                        *M.generate_new_finder()*
+    Generate a new finder for telescope
+
+
+    Parameters: ~
+        {opts} (table)  options
+
+    Fields: ~
+        {entry_maker}          (function)  function(line: string) => table
+                                           (Optional)
+        {cwd}                  (string)    current root directory (Optional)
+        {previewer}            (function)  function(line: string) => table
+                                           (Optional)
+        {sorter}               (function)  function(line: string) => table
+                                           (Optional)
+        {sametype}             (bool)      if buffers should be of same
+                                           filetype (default false)
+        {includehiddenbuffers} (bool)      if hidden buffers should be
+                                           included (default false)
+        {debug}                (bool)      enable debugging (default false)
+        {matches}              (table)     key/value pair for matching
+                                           variable names
+
+
+
+ vim:tw=78:ts=8:ft=help:norl:
