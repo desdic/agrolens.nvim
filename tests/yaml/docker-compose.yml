@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  fakelookup:
+    build: containers/fakelookup
+    ports:
+      - 8080:80
+
+  shell:
+    build: containers/shell
+    ports:
+      - 2200:2200
+
+  test-runner:
+    build: containers/test-runner
+    command: sleep 3600
+    volumes:
+      - ./:/build:ro
+      - ./report:/build/report:rw
