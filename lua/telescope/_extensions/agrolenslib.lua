@@ -1,5 +1,3 @@
-local M = {}
-
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local make_entry = require("telescope.make_entry")
@@ -7,9 +5,12 @@ local actions = require("telescope.actions")
 local conf = require("telescope.config").values
 local queries = require("nvim-treesitter.query")
 local ppath = require("plenary.path")
+local plenary = require("plenary")
+
+local M = {log = plenary.log.new({plugin = "agrolens", level = "info"})}
 
 ---@brief [[
---- Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
+--- Its an extention for telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
 ---@brief ]]
 
 ---@tag agrolens.nvim
@@ -17,13 +18,7 @@ local ppath = require("plenary.path")
 
 local function ltrim(s) return s:gsub("^%s*", "") end
 
---- Create an entry
----@param filename string
----@param matches table
----@param iter_query type
----@param bufnr type
----@param capture_name string
-M.create_entry = function(filename, matches, iter_query, bufnr, capture_name)
+M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
     local entry = {}
     entry.filename = filename
     entry.bufnr = bufnr
@@ -72,14 +67,7 @@ local does_match = function(opts, entry)
     return false
 end
 
---- Add entries if they match
----@param opts table
----@param entries table
----@param capture_names table
----@param bufnr type
----@param filename string
----@param filetype string
-M.add_entries = function(opts, entries, capture_names, bufnr, filename, filetype)
+M._add_entries = function(opts, entries, capture_names, bufnr, filename, filetype)
     local ts = vim.treesitter
     local ok, tsparser = pcall(ts.get_parser, bufnr, filetype)
     if ok and tsparser and type(tsparser) ~= "string" then
@@ -90,7 +78,7 @@ M.add_entries = function(opts, entries, capture_names, bufnr, filename, filetype
             local okgetq, iter_query = pcall(queries.get_query, filetype, "agrolens." .. capture_name)
             if okgetq and iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
-                    local entry = M.create_entry(filename, matches, iter_query, bufnr, capture_name)
+                    local entry = M._create_entry(filename, matches, iter_query, bufnr, capture_name)
 
                     if does_match(opts, entry) then table.insert(entries, format_entry(entry)) end
                 end
@@ -100,9 +88,7 @@ M.add_entries = function(opts, entries, capture_names, bufnr, filename, filetype
     return entries
 end
 
---- Get captures from query
----@param opts
-M.get_captures = function(opts)
+M._get_captures = function(opts)
     local entries = {}
 
     for _, bufnr in ipairs(opts.bufids) do
@@ -112,22 +98,14 @@ M.get_captures = function(opts)
             local filetype = vim.filetype.match({buf = bufnr})
 
             if filetype and filetype ~= "" then
-                entries = M.add_entries(opts, entries, opts.queries, bufnr, relpath, filetype)
+                entries = M._add_entries(opts, entries, opts.queries, bufnr, relpath, filetype)
             end
         end
     end
     return entries
 end
 
---- Generate a new finder for telescope
----@param opts table
-M.generate_new_finder = function(opts)
-    return finders.new_table({results = M.get_captures(opts), entry_maker = opts.entry_maker})
-end
-
--- Make a list of buffers to use
----@param opts table
-M.make_bufferlist = function(opts)
+M._make_bufferlist = function(opts)
     local buffers = {}
 
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -165,9 +143,7 @@ local function get_word_at_cursor()
     return left .. right
 end
 
--- Setup default values and in correct format
----@param opts table
-M.sanitize_opts = function(opts)
+M._sanitize_opts = function(opts)
     local querylist = {}
     if opts.query then for query in opts.query:gmatch("[^,%s]+") do table.insert(querylist, query) end end
     opts.queries = querylist
@@ -202,9 +178,7 @@ M.sanitize_opts = function(opts)
     return opts
 end
 
--- Find available buffers
----@param opts table
-M.get_buffers = function(opts)
+M._get_buffers = function(opts)
     local curbuf = vim.api.nvim_get_current_buf()
 
     opts.cur_type = vim.filetype.match({buf = curbuf})
@@ -213,7 +187,7 @@ M.get_buffers = function(opts)
     if opts.buffers and type(opts.buffers) == "string" then
         if opts.buffers == "all" then
             bufids[curbuf] = nil
-            bufids = M.make_bufferlist(opts)
+            bufids = M._make_bufferlist(opts)
         end
     end
     opts.bufids = bufids
@@ -221,22 +195,31 @@ M.get_buffers = function(opts)
     return opts
 end
 
--- Setup with a logging instance
----@param log type
-M.setup = function(log) M.log = log end
+--- Generate a new finder for telescope
+---@param opts table: options
+---@field entry_maker function: function(line: string) => table (Optional)
+---@field cwd string: current root directory (Optional)
+---@field previewer function: function(line: string) => table (Optional)
+---@field sorter function: function(line: string) => table (Optional)
+---@field sametype bool: if buffers should be of same filetype (default false)
+---@field includehiddenbuffers bool: if hidden buffers should be included (default false)
+---@field debug bool: enable debugging (default false)
+---@field matches table: key/value pair for matching variable names
+M.generate_new_finder = function(opts)
+    return finders.new_table({results = M._get_captures(opts), entry_maker = opts.entry_maker})
+end
 
--- Invoke telescope
----@param opts table
 M.run = function(opts)
     opts = opts or {}
+
+    if not M.log then M.log = plenary.log.new({plugin = "agrolens", level = "info"}) end
 
     opts.entry_maker = opts.entry_maker or make_entry.gen_from_vimgrep(opts)
     opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
     opts.previewer = opts.previewer or conf.grep_previewer(opts)
     opts.sorter = opts.sorter or conf.generic_sorter(opts)
-    opts = M.sanitize_opts(opts)
-    opts = M.get_buffers(opts)
-    M.log.debug("opts", opts)
+    opts = M._sanitize_opts(opts)
+    opts = M._get_buffers(opts)
 
     pickers.new(opts, {
         prompt_title = "Search",
