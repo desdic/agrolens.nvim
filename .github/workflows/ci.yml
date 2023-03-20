@@ -31,6 +31,9 @@ jobs:
           path: _neovim
           key: ${{ runner.os }}-${{ matrix.url }}-${{ hashFiles('todays-date') }}
 
+      - name: Install tree-sitter CLI
+        run: npm i -g tree-sitter-cli
+
       - name: Prepare
         run: |
           ${{ matrix.manager }} update
@@ -45,10 +48,15 @@ jobs:
           git clone --depth 1 https://github.com/nvim-telescope/telescope.nvim.git ~/.local/share/nvim/site/pack/vendor/start/telescope.nvim.git
           ln -s $(pwd) ~/.local/share/nvim/site/pack/vendor/start
 
+      - name: tree-sitter parsers
+        run: |
+          export PATH="${PWD}/_neovim/bin:${PATH}"
+          export VIM="${PWD}/_neovim/share/nvim/runtime"
+          nvim --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync lua c python" -c "q"
+
       - name: Run tests
         run: |
           export PATH="${PWD}/_neovim/bin:${PATH}"
           export VIM="${PWD}/_neovim/share/nvim/runtime"
-          nvim --headless -c "TSInstall lua c cpp" -c "q"
           nvim --version
           make test
