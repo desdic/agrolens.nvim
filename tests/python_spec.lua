@@ -8,15 +8,12 @@ describe("python", function()
         buffers = vim.api.nvim_list_bufs()
         assert.equal(#buffers, 1)
 
-        local plenary = require "plenary"
         lens = require("telescope._extensions.agrolenslib")
-        local log = plenary.log.new({plugin = "agrolens", level = "info"})
-        lens.setup(log)
-        lens.get_captures({queries={"functions"}, bufids=buffers})
+        lens._get_captures({queries={"functions"}, bufids=buffers})
     end)
 
     it("functions", function()
-        local entries = lens.get_captures({queries={"functions"}, bufids=buffers})
+        local entries = lens._get_captures({queries={"functions"}, bufids=buffers})
 
         assert.equals(#entries, 3)
         assert.equals("tests/python/test.py:10:4:    def hello(self):", entries[1])
