@@ -12,7 +12,7 @@ describe("docker-compose.yml", function()
         lens._get_captures({queries={"labels"}, bufids=buffers})
     end)
 
-    it("functions", function()
+    it("labels", function()
         local entries = lens._get_captures({queries={"labels"}, bufids=buffers})
 
         -- labels
