@@ -6,6 +6,8 @@
 
 Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope.
 
+![Agrolens demo](media/agrolens.gif "Agrolens demo")
+
 ## Requirements
 
 [Neovim 0.8+](https://github.com/neovim/neovim)
