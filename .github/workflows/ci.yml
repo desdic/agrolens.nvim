@@ -52,7 +52,7 @@ jobs:
         run: |
           export PATH="${PWD}/_neovim/bin:${PATH}"
           export VIM="${PWD}/_neovim/share/nvim/runtime"
-          nvim --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync lua c python go make yaml" -c "q"
+          nvim --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync lua c python go make yaml markdown" -c "q"
 
       - name: Run tests
         run: |
