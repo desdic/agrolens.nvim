@@ -4,7 +4,7 @@
 
 # What is Agrolens
 
-Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
+Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope.
 
 ## Requirements
 
@@ -56,7 +56,7 @@ require("telescope").extensions = {
 
 | Parameter | Value(s) | Description |
 | --- | ---| ----------- |
-| query | functions,methods | A comma seperated list with queries you want to run |
+| query | functions,labels | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
 | includehiddenbuffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
 | sametype | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
@@ -98,9 +98,9 @@ You can place your custom queries in `~/.config/nvim/queries` you can load them 
 :Telescope agrolens query=myspecial
 ```
 
-# Credit
+# Similar plugins
 
-I absolute love [ziontee113/neo-minimap](https://github.com/ziontee113/neo-minimap) and this is where the idea to this plugin started. But I don't think writing tree-sitter queries and wanted to provide a solid (yes, it makes it opinionated) set of queries and still support custom queries.
+[ziontee113/neo-minimap](https://github.com/ziontee113/neo-minimap)
 
 # Help wanted
 
