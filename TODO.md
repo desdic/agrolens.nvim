@@ -1,3 +1,0 @@
-# TODO
-
-* Record a demo.
