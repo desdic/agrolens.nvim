@@ -92,14 +92,12 @@ M._get_captures = function(opts)
     local entries = {}
 
     for _, bufnr in ipairs(opts.bufids) do
-        if vim.fn.getbufinfo(bufnr)[1].hidden == 0 then
-            local buffilename = vim.api.nvim_buf_get_name(bufnr)
-            local relpath = ppath:new(buffilename):make_relative(opts.cwd)
-            local filetype = vim.filetype.match({buf = bufnr})
+        local buffilename = vim.api.nvim_buf_get_name(bufnr)
+        local relpath = ppath:new(buffilename):make_relative(opts.cwd)
+        local filetype = vim.filetype.match({buf = bufnr})
 
-            if filetype and filetype ~= "" then
-                entries = M._add_entries(opts, entries, opts.queries, bufnr, relpath, filetype)
-            end
+        if filetype and filetype ~= "" then
+            entries = M._add_entries(opts, entries, opts.queries, bufnr, relpath, filetype)
         end
     end
     return entries
