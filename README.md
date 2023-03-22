@@ -66,9 +66,9 @@ require("telescope").extensions = {
 
 Examples
 
-Use queries from `agrolens.functions` and `agrolens.variables`
+Use queries from `agrolens.functions` and `agrolens.labels`
 ```
-:Telescope agrolens query=functions,variables
+:Telescope agrolens query=functions,labels
 ```
 
 Use query functions but run it on all buffers regards filetype
