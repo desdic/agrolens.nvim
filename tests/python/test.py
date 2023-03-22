@@ -12,7 +12,7 @@ class Stuff:
 
 
 def hello():
-    print("hello")
+    return "hello"
 
 
 def main():
@@ -22,7 +22,8 @@ def main():
 
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
 
-    hello()
+    msg = hello()
+    print(msg)
     m = Stuff()
     m.hello()
 
