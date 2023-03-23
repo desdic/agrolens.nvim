@@ -69,6 +69,7 @@ end
 
 M._add_entries = function(opts, entries, capture_names, bufnr, filename, filetype)
     local ts = vim.treesitter
+    local dublicates = {}
     local ok, tsparser = pcall(ts.get_parser, bufnr, filetype)
     if ok and tsparser and type(tsparser) ~= "string" then
         local trees = tsparser:parse()
@@ -80,7 +81,12 @@ M._add_entries = function(opts, entries, capture_names, bufnr, filename, filetyp
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = M._create_entry(filename, matches, iter_query, bufnr, capture_name)
 
-                    if does_match(opts, entry) then table.insert(entries, format_entry(entry)) end
+                    local formated_entry = format_entry(entry)
+
+                    if not dublicates[formated_entry] then
+                        dublicates[formated_entry] = true
+                        if does_match(opts, entry) then table.insert(entries, formated_entry) end
+                    end
                 end
             end
         end
