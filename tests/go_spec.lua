@@ -22,4 +22,16 @@ describe("go", function()
         assert.equals("tests/go/main.go:13:0:func ret42() int {", entries[2])
         assert.equals("tests/go/main.go:17:0:func main() {", entries[3])
     end)
+
+    it("calling", function()
+        local entries = lens._get_captures({queries={"calling"}, bufids=buffers})
+
+        assert.equals(#entries, 5)
+
+        assert.equals("tests/go/main.go:18:1:\tnum := ret42()", entries[1])
+        assert.equals("tests/go/main.go:21:10:\tnum2 := p.GetAge()", entries[2])
+        assert.equals("tests/go/main.go:23:1:\tret42()", entries[3])
+        assert.equals("tests/go/main.go:24:2:\tp.GetAge()", entries[4])
+        assert.equals("tests/go/main.go:26:2:\tfmt.Println(num, num2)", entries[5])
+    end)
 end)
