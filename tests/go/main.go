@@ -15,5 +15,13 @@ func ret42() int {
 }
 
 func main() {
-	fmt.Println(ret42())
+	num := ret42()
+
+	p := Person{Age: 43}
+	num2 := p.GetAge()
+
+	ret42()
+	p.GetAge()
+
+	fmt.Println(num, num2)
 }
