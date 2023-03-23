@@ -23,8 +23,8 @@ describe("go", function()
         assert.equals("tests/go/main.go:17:0:func main() {", entries[3])
     end)
 
-    it("calling", function()
-        local entries = lens._get_captures({queries={"calling"}, bufids=buffers})
+    it("callings", function()
+        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
 
         assert.equals(#entries, 5)
 

@@ -23,8 +23,8 @@ describe("cpp", function()
 
     end)
 
-    it("calling", function()
-        local entries = lens._get_captures({queries={"calling"}, bufids=buffers})
+    it("callings", function()
+        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
 
         assert.equals(#entries, 4)
         assert.equals('tests/cpp/main.cc:21:2:  std::cout << "Age: " << p.getAge() << std::endl;', entries[1])

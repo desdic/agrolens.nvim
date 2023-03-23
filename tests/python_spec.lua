@@ -21,8 +21,8 @@ describe("python", function()
         assert.equals("tests/python/test.py:18:0:def main():", entries[3])
     end)
 
-    it("calling", function()
-        local entries = lens._get_captures({queries={"calling"}, bufids=buffers})
+    it("callings", function()
+        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
 
         assert.equals(#entries, 11)
         assert.equals("tests/python/test.py:6:9:logger = logging.getLogger(__name__)", entries[1])

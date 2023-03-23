@@ -25,8 +25,8 @@ describe("glsl", function()
         assert.equals("tests/glsl/default.frag:104:0:void main()", entries[4])
 
     end)
-    it("calling", function()
-        local entries = lens._get_captures({queries={"calling"}, bufids=buffers})
+    it("callings", function()
+        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
 
         assert.equals(#entries, 1)
         assert.equals("tests/glsl/default.frag:107:2:  FragColor = spotLight();", entries[1])
