@@ -6,7 +6,8 @@
 
 Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope.
 
-![Agrolens demo](https://www.greyhat.dk/agrolens/agrolens.gif "Agrolens demo")
+[![Agrolens.nvim demo](http://img.youtube.com/vi/qPXj1Egi64Y/0.jpg)](http://www.youtube.com/watch?v=qPXj1Egi64Y "Agrolens.nvim demo")
+
 
 ## Requirements
 
