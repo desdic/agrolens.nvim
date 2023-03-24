@@ -17,6 +17,9 @@ fn main() {
 
     let p = Person{age: 43};
 
+    get_num(43);
+    p.get_age();
+
     println!("Hello World!");
     println!("{} or {}", get_num(42), p.get_age());
 }

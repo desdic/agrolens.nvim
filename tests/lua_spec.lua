@@ -20,9 +20,15 @@ describe("lua", function()
         assert.equals("tests/lua/test.lua:1:0:local hello1 = function()", entries[1])
         assert.equals("tests/lua/test.lua:5:0:hello2 = function()", entries[2])
         assert.equals("tests/lua/test.lua:9:0:function hello3()", entries[3])
-
-        -- methods
         assert.equals("tests/lua/test.lua:15:0:M.hello4 = function()", entries[4])
         assert.equals("tests/lua/test.lua:19:0:function M.hello5()", entries[5])
+    end)
+
+    it("callings", function()
+        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
+
+        assert.equals(#entries, 10)
+        assert.equals('tests/lua/test.lua:2:4:    print("hello1")', entries[1])
+        assert.equals('tests/lua/test.lua:6:4:    print("hello2")', entries[2])
     end)
 end)
