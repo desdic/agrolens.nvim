@@ -44,7 +44,7 @@ require("telescope").extensions = {
     agrolens = {
        debug = false,
        sametype = true,
-       includehiddenbuffers=false,
+       includehiddenbuffers = false,
     }
 }
 ```
