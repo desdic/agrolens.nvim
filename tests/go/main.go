@@ -1,27 +1,43 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
+
+type format_func func(p Person) string
 
 type Person struct {
-	Age int
+	Name string
+	Born string
 }
 
-func (p *Person) GetAge() int {
-	return p.Age
+func (p *Person) GetName() string {
+	return p.Name
 }
 
-func ret42() int {
-	return 42
+func print_person(p Person, fn format_func) {
+	fmt.Println(fn(p))
 }
 
 func main() {
-	num := ret42()
+	donald := Person{Name: "Donald Duck", Born: "07-09-1934"}
 
-	p := Person{Age: 43}
-	num2 := p.GetAge()
+	/*
+	   formatting function
+	*/
+	format_func := func(p Person) string {
+		tt, err := time.Parse("01-02-2006", p.Born)
+		if err != nil {
+			return err.Error()
+		}
 
-	ret42()
-	p.GetAge()
+		currentTime := time.Now()
+		ageInDays := int(currentTime.Sub(tt).Hours() / 24)
 
-	fmt.Println(num, num2)
+		return fmt.Sprintf("%s is %d days old", p.GetName(), ageInDays)
+	}
+
+	// Print Donald
+	print_person(donald, format_func)
 }

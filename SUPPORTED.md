@@ -6,7 +6,7 @@ Languages
 | ----------- | ----------- | ----------- | --- |
 | c | x | x | x |
 | cpp | x | x | x |
-| go | x | x |
+| go | x | x | x |
 | lua | x | x |
 | perl | x | x |
 | php | x | x* |
