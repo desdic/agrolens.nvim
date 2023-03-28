@@ -1,5 +1,4 @@
 describe("php", function()
-
     local lens = nil
     local buffers = nil
 
@@ -9,23 +8,43 @@ describe("php", function()
         assert.equal(#buffers, 1)
 
         lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries={"functions"}, bufids=buffers})
+        lens._get_captures({queries = {"functions"}, bufids = buffers})
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({queries={"functions"}, bufids=buffers})
+        local entries = lens._get_captures({
+            queries = {"functions"},
+            bufids = buffers
+        })
 
         assert.equals(#entries, 3)
-        assert.equals('tests/php/test.php:5:2:  function __construct($age) {', entries[1])
-        assert.equals('tests/php/test.php:8:2:  function getAge() {', entries[2])
-        assert.equals('tests/php/test.php:13:0:function newPerson($age) {', entries[3])
+        assert.equals("tests/php/test.php:6:2:  function __construct($age) {",
+                      entries[1])
+        assert.equals("tests/php/test.php:9:2:  function getAge() {", entries[2])
+        assert.equals("tests/php/test.php:14:0:function newPerson($age) {",
+                      entries[3])
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
+        local entries = lens._get_captures({
+            queries = {"callings"},
+            bufids = buffers
+        })
 
         assert.equals(#entries, 5)
-        assert.equals('tests/php/test.php:17:0:$p = newPerson(42);', entries[1])
-        assert.equals('tests/php/test.php:19:9:$num1 = $p->getAge();', entries[2])
+        assert.equals("tests/php/test.php:21:0:$p = newPerson(42);", entries[1])
+        assert.equals("tests/php/test.php:23:9:$num1 = $p->getAge();",
+                      entries[2])
+    end)
+
+    it("comments", function()
+        local entries = lens._get_captures({
+            queries = {"comments"},
+            bufids = buffers
+        })
+
+        assert.equals(#entries, 2)
+        assert.equals("tests/php/test.php:3:0:// A person", entries[1])
+        assert.equals("tests/php/test.php:18:0:/*", entries[2])
     end)
 end)

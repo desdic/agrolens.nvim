@@ -1,5 +1,6 @@
 <?php
 
+// A person
 class Person {
   private $age;
   function __construct($age) {
@@ -14,6 +15,9 @@ function newPerson($age) {
   return new Person($age);
 }
 
+/*
+ Create a person
+ */
 $p = newPerson(42);
 
 $num1 = $p->getAge();

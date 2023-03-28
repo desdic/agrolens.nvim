@@ -10,8 +10,12 @@ function hello3()
     print("hello3")
 end
 
+-- Local object
 local M = {}
 
+--[[
+Ms hello function
+--]]
 M.hello4 = function()
     print("hello4")
 end
