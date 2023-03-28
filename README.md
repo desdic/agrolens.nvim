@@ -59,7 +59,7 @@ require("telescope").extensions = {
 
 | Parameter | Value(s) | Description |
 | --- | ---| ----------- |
-| query | functions,labels | A comma seperated list with queries you want to run |
+| query | functions,callings,comments,labels | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
 | includehiddenbuffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
 | sametype | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
@@ -86,6 +86,11 @@ due to to provide LSP/tree-sitter and you can search in those too
 Use query functions on all buffers but only if the `agrolens.name` matches the word on the cursor
 ```
 :Telescope agrolens query=functions buffers=all match=name
+```
+
+Or callings (functions/methods called) to find a function being called named `myfunctions` or a method of object `M`
+```
+:Telescope agrolens query=callings buffers=all match=name=myfunction,object=M
 ```
 
 Same query as above but `agrolens.name` must by either main or myfunc
