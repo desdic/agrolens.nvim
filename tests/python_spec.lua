@@ -1,5 +1,4 @@
 describe("python", function()
-
     local lens = nil
     local buffers = nil
 
@@ -9,32 +8,59 @@ describe("python", function()
         assert.equal(#buffers, 1)
 
         lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries={"functions"}, bufids=buffers})
+        lens._get_captures({queries = {"functions"}, bufids = buffers})
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({queries={"functions"}, bufids=buffers})
+        local entries = lens._get_captures({
+            queries = {"functions"},
+            bufids = buffers
+        })
 
-        assert.equals(#entries, 3)
-        assert.equals("tests/python/test.py:10:4:    def hello(self):", entries[1])
-        assert.equals("tests/python/test.py:14:0:def hello():", entries[2])
-        assert.equals("tests/python/test.py:18:0:def main():", entries[3])
+        assert.equals(#entries, 4)
+        assert.equals(
+            "tests/python/test.py:11:4:    def __init__(self, name: str, born: str):",
+            entries[1])
+        assert.equals("tests/python/test.py:15:4:    def print(self, format):",
+                      entries[2])
+        assert.equals("tests/python/test.py:20:0:def format(p: Person) -> str:",
+                      entries[3])
+        assert.equals("tests/python/test.py:32:0:def main():", entries[4])
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({queries={"callings"}, bufids=buffers})
+        local entries = lens._get_captures({
+            queries = {"callings"},
+            bufids = buffers
+        })
 
-        assert.equals(#entries, 11)
-        assert.equals("tests/python/test.py:6:9:logger = logging.getLogger(__name__)", entries[1])
-        assert.equals('tests/python/test.py:11:8:        print("hello")', entries[2])
-        assert.equals("tests/python/test.py:19:21:    arg_parser = argparse.ArgumentParser()", entries[3])
-        assert.equals('tests/python/test.py:20:8:    arg_parser.add_argument("--debug", "-d", action="store_true", help="enable debug")', entries[4])
-        assert.equals("tests/python/test.py:21:15:    args = arg_parser.parse_args()", entries[5])
-        assert.equals("tests/python/test.py:23:8:    logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)", entries[6])
-        assert.equals('tests/python/test.py:25:4:    msg = hello()', entries[7])
-        assert.equals('tests/python/test.py:26:4:    print(msg)', entries[8])
-        assert.equals('tests/python/test.py:27:4:    m = Stuff()', entries[9])
-        assert.equals('tests/python/test.py:28:8:    m.hello()', entries[10])
-        assert.equals('tests/python/test.py:32:4:    main()', entries[11])
+        assert.equals(#entries, 6)
+        assert.equals("tests/python/test.py:16:8:        print(format(self))",
+                      entries[1])
+        assert.equals(
+            'tests/python/test.py:24:19:    borndate = datetime.strptime(p.born, "%d-%m-%Y")',
+            entries[2])
+        assert.equals("tests/python/test.py:25:14:    now = datetime.today()",
+                      entries[3])
+        assert.equals(
+            'tests/python/test.py:34:4:    donald = Person(name="Donald Duck", born="07-09-1934")',
+            entries[4])
+        assert.equals("tests/python/test.py:35:8:    donald.print(format)",
+                      entries[5])
+        assert.equals("tests/python/test.py:39:4:    main()", entries[6])
+    end)
+    it("comments", function()
+        local entries = lens._get_captures({
+            queries = {"comments"},
+            bufids = buffers
+        })
+
+        assert.equals(#entries, 4)
+        assert.equals("tests/python/test.py:1:0:#!/usr/bin/env python3",
+                      entries[1])
+        assert.equals('tests/python/test.py:3:0:"""', entries[2])
+        assert.equals('tests/python/test.py:21:8:    """', entries[3])
+        assert.equals("tests/python/test.py:33:4:    # Create Donald",
+                      entries[4])
     end)
 end)
