@@ -10,7 +10,7 @@ Languages
 | lua | x | x |
 | perl | x | x |
 | php | x | x* |
-| python | x | x |
+| python | x | x | x
 | ruby | x | x |
 | rust | x | x** | x
 
