@@ -12,7 +12,7 @@ Languages
 | php | x | x* |
 | python | x | x |
 | ruby | x | x |
-| rust | x | x** |
+| rust | x | x** | x
 
 \* calling of functions in print/echo is currently not supported.
 
