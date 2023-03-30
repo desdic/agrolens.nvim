@@ -43,8 +43,9 @@ require "telescope".load_extension("agrolens")
 require("telescope").extensions = {
     agrolens = {
        debug = false,
-       sametype = true,
-       includehiddenbuffers = false,
+       same_type = true,
+       include_hidden_buffers = false,
+       disable_indentation = false,
     }
 }
 ```
@@ -61,9 +62,11 @@ require("telescope").extensions = {
 | --- | ---| ----------- |
 | query | functions,callings,comments,labels | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
-| includehiddenbuffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
-| sametype | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
+| disable_indentation | true/false(default) | Strips spaces from line when showing in telescope |
+| include_hidden_buffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
 | match | name and string | Matches a variable (minus the agrolens namespace) from the query with a string. If no string is provided its the word where the cursor is |
+| same_type | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
+
 
 Examples
 
@@ -80,7 +83,7 @@ Use query functions but run it on all buffers regards filetype
 Use query functions but run it on all buffers regards filetype and include hidden buffers. Some files are pre-loaded
 due to to provide LSP/tree-sitter and you can search in those too
 ```
-:Telescope agrolens query=functions buffers=all includehiddenbuffers=true
+:Telescope agrolens query=functions buffers=all include_hidden_buffers=true
 ```
 
 Use query functions on all buffers but only if the `agrolens.name` matches the word on the cursor
@@ -97,6 +100,10 @@ Same query as above but `agrolens.name` must by either main or myfunc
 ```
 :Telescope agrolens query=functions buffers=all match=name=main,name=myfunc
 ```
+
+## Json/Yaml/etc
+
+Some file formats just doesn't fit into the category labels so custom ones have been made for different formats for json/yaml. See  [SUPPORTED](SUPPORTED.md)
 
 ## Custom queries
 

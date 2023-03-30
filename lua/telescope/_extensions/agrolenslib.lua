@@ -17,6 +17,7 @@ local M = {log = plenary.log.new({plugin = "agrolens", level = "info"})}
 ---@config { ["name"] = "INTRODUCTION"}
 
 local function ltrim(s) return s:gsub("^%s*", "") end
+local function all_trim(s) return s:match( "^%s*(.-)%s*$" ) end
 
 M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
     local entry = {}
@@ -81,6 +82,9 @@ M._add_entries = function(opts, entries, capture_names, bufnr, filename, filetyp
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = M._create_entry(filename, matches, iter_query, bufnr, capture_name)
 
+                    if opts.disable_indentation then
+                        entry.line = all_trim(entry.line)
+                    end
                     local formated_entry = format_entry(entry)
 
                     if not dublicates[formated_entry] then
@@ -113,8 +117,8 @@ M._make_bufferlist = function(opts)
     local buffers = {}
 
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if opts.sametype == false or vim.filetype.match({buf = bufnr}) == opts.cur_type then
-            if opts.includehiddenbuffers == false then
+        if opts.same_type == false or vim.filetype.match({buf = bufnr}) == opts.cur_type then
+            if opts.include_hidden_buffers == false then
                 if vim.fn.getbufinfo(bufnr)[1].listed == 1 then table.insert(buffers, bufnr) end
             else
                 table.insert(buffers, bufnr)
@@ -149,16 +153,20 @@ end
 
 M._sanitize_opts = function(opts)
     local querylist = {}
+
+    local aliases = M.telescope_config.aliases or {}
+    opts.query = aliases[opts.query] or opts.query
+
     if opts.query then for query in opts.query:gmatch("[^,%s]+") do table.insert(querylist, query) end end
     opts.queries = querylist
 
-    local includehiddenbuffers = M.telescope_config.includehiddenbuffers or false
-    if opts.includehiddenbuffers == true then includehiddenbuffers = true end
-    opts.includehiddenbuffers = includehiddenbuffers
+    local include_hidden_buffers = M.telescope_config.include_hidden_buffers or false
+    if opts.include_hidden_buffers == true then include_hidden_buffers = true end
+    opts.include_hidden_buffers = include_hidden_buffers
 
-    local sametype = M.telescope_config.sametype
-    if opts.sametype == false then sametype = false end
-    opts.sametype = sametype
+    local same_type = M.telescope_config.same_type
+    if opts.same_type == false then same_type = false end
+    opts.same_type = same_type
 
     local matches = {}
     if opts.match then
@@ -176,6 +184,8 @@ M._sanitize_opts = function(opts)
             table.insert(matches, entry)
         end
     end
+
+    opts.disable_indentation = M.telescope_config.disable_indentation or false
 
     if #matches > 0 then opts.matches = matches end
 
@@ -205,16 +215,31 @@ end
 ---@field cwd string: current root directory (Optional)
 ---@field previewer function: function(line: string) => table (Optional)
 ---@field sorter function: function(line: string) => table (Optional)
----@field sametype bool: if buffers should be of same filetype (default false)
----@field includehiddenbuffers bool: if hidden buffers should be included (default false)
+---@field same_type bool: if buffers should be of same filetype (default false)
+---@field include_hidden_buffers bool: if hidden buffers should be included (default false)
+---@field disable_indentation bool: if true it strips the whitespaces (default false)
 ---@field debug bool: enable debugging (default false)
 ---@field matches table: key/value pair for matching variable names
 M.generate_new_finder = function(opts)
     return finders.new_table({results = M._get_captures(opts), entry_maker = opts.entry_maker})
 end
 
+M.__check_deprecated = function(opts)
+    if M.telescope_config.disableindentation or opts.disableindentation then
+        M.log.warn("disableindentation deprecated use disable_indentation")
+    end
+    if M.telescope_config.sametype or opts.sametype then
+        M.log.warn("sametype is deprecated use same_type")
+    end
+    if M.telescope_config.includehiddenbuffers or opts.includehiddenbuffers then
+        M.log.warn("includehiddenbuffers is deprecated use include_hidden_buffers")
+    end
+end
+
 M.run = function(opts)
     opts = opts or {}
+
+    M.__check_deprecated(opts)
 
     if not M.log then M.log = plenary.log.new({plugin = "agrolens", level = "info"}) end
 

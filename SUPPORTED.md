@@ -1,6 +1,6 @@
 # Supported tree-sitter language/file formats
 
-Languages
+## Languages
 
 | Tree-sitter | functions | callings | comments 
 | ----------- | ----------- | ----------- | --- |
@@ -15,18 +15,24 @@ Languages
 | ruby | x | x | x
 | rust | x | x** | x
 
-\* calling of functions in print/echo is currently not supported.
-
-\** calling of functions in macros line println! is currently not supported.
-
-Formats
+## Labels
 
 | Tree-sitter | labels |
 | ----------- | --- |
 | make | x |
 | markdown | x |
-| toml | x |
-| yaml | x* |
 
+## Fileformats
 
-\* docker-compose.yml is the only one supported yet
+### yaml
+
+| Query | Description |
+| ----------- | --- |
+| docker-compose | Docker compose services  |
+| github-workflow-steps | list of github workflow |
+
+### json
+
+| Query | Description |
+| ----------- | --- |
+| cheflxchost | Show lxc guests |
