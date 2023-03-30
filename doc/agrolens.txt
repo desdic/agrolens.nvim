@@ -12,20 +12,22 @@ M.generate_new_finder({opts})                        *M.generate_new_finder()*
         {opts} (table)  options
 
     Fields: ~
-        {entry_maker}          (function)  function(line: string) => table
-                                           (Optional)
-        {cwd}                  (string)    current root directory (Optional)
-        {previewer}            (function)  function(line: string) => table
-                                           (Optional)
-        {sorter}               (function)  function(line: string) => table
-                                           (Optional)
-        {sametype}             (bool)      if buffers should be of same
-                                           filetype (default false)
-        {includehiddenbuffers} (bool)      if hidden buffers should be
-                                           included (default false)
-        {debug}                (bool)      enable debugging (default false)
-        {matches}              (table)     key/value pair for matching
-                                           variable names
+        {entry_maker}            (function)  function(line: string) => table
+                                             (Optional)
+        {cwd}                    (string)    current root directory (Optional)
+        {previewer}              (function)  function(line: string) => table
+                                             (Optional)
+        {sorter}                 (function)  function(line: string) => table
+                                             (Optional)
+        {same_type}              (bool)      if buffers should be of same
+                                             filetype (default false)
+        {include_hidden_buffers} (bool)      if hidden buffers should be
+                                             included (default false)
+        {disable_indentation}    (bool)      if true it strips the whitespaces
+                                             (default false)
+        {debug}                  (bool)      enable debugging (default false)
+        {matches}                (table)     key/value pair for matching
+                                             variable names
 
 
 
