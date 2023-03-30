@@ -46,6 +46,7 @@ require("telescope").extensions = {
        same_type = true,
        include_hidden_buffers = false,
        disable_indentation = false,
+       aliases = {}
     }
 }
 ```
@@ -60,6 +61,7 @@ require("telescope").extensions = {
 
 | Parameter | Value(s) | Description |
 | --- | ---| ----------- |
+| aliases | empty | Create aliases for longer lists of queries |
 | query | functions,callings,comments,labels | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
 | disable_indentation | true/false(default) | Strips spaces from line when showing in telescope |
