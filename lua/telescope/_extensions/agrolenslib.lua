@@ -220,6 +220,7 @@ end
 ---@field disable_indentation bool: if true it strips the whitespaces (default false)
 ---@field debug bool: enable debugging (default false)
 ---@field matches table: key/value pair for matching variable names
+---@field aliases table: key/value pair for aliases for longer lists of queries (value is comma seperated)
 M.generate_new_finder = function(opts)
     return finders.new_table({results = M._get_captures(opts), entry_maker = opts.entry_maker})
 end

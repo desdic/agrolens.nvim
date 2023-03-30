@@ -28,6 +28,9 @@ M.generate_new_finder({opts})                        *M.generate_new_finder()*
         {debug}                  (bool)      enable debugging (default false)
         {matches}                (table)     key/value pair for matching
                                              variable names
+        {aliases}                (table)     key/value pair for aliases for
+                                             longer lists of queries (value is
+                                             comma seperated)
 
 
 
