@@ -5,6 +5,9 @@ all: lint test
 test:
 	nvim --headless -u scripts/minimal_init.lua -c "PlenaryBustedDirectory tests/ { minimal_init = './scripts/minimal_init.lua' }"
 
+fmt:
+	stylua lua/ --config-path=.stylua.toml
+
 lint:
 	luacheck lua/telescope
 
