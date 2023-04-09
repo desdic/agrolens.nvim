@@ -88,7 +88,15 @@ local function escape_pattern(text)
     return text:gsub("([^%w])", "%%%1")
 end
 
-M.do_closures = function(block, next_node, numnodes, content, captures, count)
+M.do_closures = function(
+    block,
+    next_node,
+    numnodes,
+    content,
+    captures,
+    count,
+    captureid
+)
     local level = block.level
     local next_level = numnodes
     if next_node then
@@ -101,7 +109,15 @@ M.do_closures = function(block, next_node, numnodes, content, captures, count)
         for x = 1, num do
             content = content .. ")"
             if captures[x] then
-                content = content .. " " .. captures[x]
+                if captures[x] == "@cap" then
+                    content = content
+                        .. " "
+                        .. captures[x]
+                        .. tostring(captureid)
+                    captureid = captureid + 1
+                else
+                    content = content .. " " .. captures[x]
+                end
             end
         end
         count = count - num
@@ -110,25 +126,32 @@ M.do_closures = function(block, next_node, numnodes, content, captures, count)
         count = count - 1
     end
 
-    return content, count
+    return content, count, captureid
 end
 
-M.end_closures = function(list, captures, count)
+M.end_closures = function(list, captures, count, captureid)
     if count > 0 then
         local index = #list
         for x = 1, count do
             list[index] = list[index] .. ")"
             if captures[x] then
-                list[index] = list[index] .. " " .. captures[x]
+                if captures[x] == "@cap" then
+                    list[index] = list[index]
+                        .. " "
+                        .. captures[x]
+                        .. tostring(captureid)
+                    captureid = captureid + 1
+                else
+                    list[index] = list[index] .. " " .. captures[x]
+                end
             end
         end
     end
 end
 
-M.add_captures = function(opts, captures, capindex, captureid)
+M.add_captures = function(opts, captures, capindex)
     if not captures[capindex] and opts.all_captures then
-        captures[capindex] = "@cap" .. tostring(captureid)
-        captureid = captureid + 1
+        captures[capindex] = "@cap"
     end
 end
 
@@ -204,9 +227,9 @@ M.generate = function(opts)
 
     local list = {}
     local captures = {}
-    local captureid = 1
     local count = 0
     local numnodes = #tree
+    local captureid = 1
 
     for i, block in ipairs(tree) do
         if block.node ~= root or opts.include_root_node then
@@ -218,22 +241,23 @@ M.generate = function(opts)
             count = count + 1
 
             M.match_line(block, line, captures, capindex)
-            M.add_captures(opts, captures, capindex, captureid)
+            M.add_captures(opts, captures, capindex)
 
-            content, count = M.do_closures(
+            content, count, captureid = M.do_closures(
                 block,
                 next_node,
                 numnodes,
                 content,
                 captures,
-                count
+                count,
+                captureid
             )
 
             table.insert(list, content)
         end
     end
 
-    M.end_closures(list, captures, count)
+    M.end_closures(list, captures, count, captureid)
 
     if #list > 0 then
         if opts.in_register then
