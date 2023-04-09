@@ -60,7 +60,7 @@ require("telescope").extensions = {
 ## Parameters
 
 | Parameter | Value(s) | Description |
-| --- | ---| ----------- |
+| :-- | :--| :---------- |
 | aliases | empty | Create aliases for longer lists of queries |
 | query | functions,callings,comments,labels | A comma seperated list with queries you want to run |
 | buffers | all | Run queries on all buffers | 
@@ -114,6 +114,25 @@ You can place your custom queries in `~/.config/nvim/queries` you can load them 
 ```
 :Telescope agrolens query=myspecial
 ```
+
+## Generating queries
+
+Agrolens can generate queries (or tries as good as it can) by invoking the generate function on the cursor position with
+
+```lua
+require("agrolens").generate({}))
+```
+
+Default options are:
+
+| Options | Type | Description |
+| :-- | :-- | :---------- |
+| register | char | Register to copy to. Default ""|
+| in_buffer | boolean | Create a buffer with query, default true|
+| in_register | boolean | Copy query to register (clipboard), default true|
+| full_document | boolean | Create query for full document/tree|
+| all_captures | boolean | Create a capture group for every possible combination, default false|
+| include_root_node | boolean | include root node, default false |
 
 # Similar plugins
 
