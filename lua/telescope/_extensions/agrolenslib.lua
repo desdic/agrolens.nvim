@@ -6,6 +6,7 @@ local conf = require("telescope.config").values
 local queries = require("nvim-treesitter.query")
 local ppath = require("plenary.path")
 local plenary = require("plenary")
+local utils = require("telescope._extensions.utils")
 
 local M = { log = plenary.log.new({ plugin = "agrolens", level = "info" }) }
 
@@ -15,13 +16,6 @@ local M = { log = plenary.log.new({ plugin = "agrolens", level = "info" }) }
 
 ---@tag agrolens.nvim
 ---@config { ["name"] = "INTRODUCTION"}
-
-local function ltrim(s)
-    return s:gsub("^%s*", "")
-end
-local function all_trim(s)
-    return s:match("^%s*(.-)%s*$")
-end
 
 M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
     local entry = {}
@@ -51,7 +45,7 @@ M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
 
         entry.lnum = lnum + 1
         entry.col = from
-            + (string.len(line_text) - string.len(ltrim(line_text)))
+            + (string.len(line_text) - string.len(utils.ltrim(line_text)))
         entry.line = line_text
     end
     return entry
@@ -115,7 +109,7 @@ M._add_entries = function(
                     )
 
                     if opts.disable_indentation then
-                        entry.line = all_trim(entry.line)
+                        entry.line = utils.all_trim(entry.line)
                     end
                     local formated_entry = format_entry(entry)
 
@@ -307,30 +301,32 @@ M.run = function(opts)
     opts = opts or {}
 
     M.__check_deprecated(opts)
+    opts = M._sanitize_opts(opts)
 
     if not M.log then
         M.log = plenary.log.new({ plugin = "agrolens", level = "info" })
     end
 
-    opts.entry_maker = opts.entry_maker or make_entry.gen_from_vimgrep(opts)
-    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
-    opts.previewer = opts.previewer or conf.grep_previewer(opts)
-    opts.sorter = opts.sorter or conf.generic_sorter(opts)
-    opts = M._sanitize_opts(opts)
-    opts = M._get_buffers(opts)
+    if opts.query then
+        opts.entry_maker = opts.entry_maker or make_entry.gen_from_vimgrep(opts)
+        opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+        opts.previewer = opts.previewer or conf.grep_previewer(opts)
+        opts.sorter = opts.sorter or conf.generic_sorter(opts)
+        opts = M._get_buffers(opts)
 
-    pickers
-        .new(opts, {
-            prompt_title = "Search",
-            finder = M.generate_new_finder(opts),
-            previewer = opts.previewer,
-            sorter = opts.sorter,
-            attach_mappings = function(_, map)
-                map("i", "<c-space>", actions.to_fuzzy_refine)
-                return true
-            end,
-        })
-        :find()
+        pickers
+            .new(opts, {
+                prompt_title = "Search",
+                finder = M.generate_new_finder(opts),
+                previewer = opts.previewer,
+                sorter = opts.sorter,
+                attach_mappings = function(_, map)
+                    map("i", "<c-space>", actions.to_fuzzy_refine)
+                    return true
+                end,
+            })
+            :find()
+    end
 end
 
 return M
