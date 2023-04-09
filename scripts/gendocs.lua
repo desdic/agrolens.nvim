@@ -7,6 +7,7 @@ docs.test = function()
   local input_files = {
     "./lua/telescope/_extensions/agrolens.lua",
     "./lua/telescope/_extensions/agrolenslib.lua",
+    "./lua/agrolens/init.lua",
   }
 
   local output_file = "./doc/agrolens.txt"
