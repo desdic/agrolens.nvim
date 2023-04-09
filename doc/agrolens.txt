@@ -34,4 +34,29 @@ M.generate_new_finder({opts})                        *M.generate_new_finder()*
 
 
 
+================================================================================
+M.generate({opts})                                              *M.generate()*
+    Generate a query from cursor position Example usage:
+    >
+    require("agrolens").generate({in_buffer=false})
+<
+
+
+    Parameters: ~
+        {opts} (table)  options
+
+    Fields: ~
+        {register}          (char)     register to copy to. Default ""
+        {in_buffer}         (boolean)  create a buffer with query, default
+                                       true
+        {in_register}       (boolean)  copy query to register (clipboard),
+                                       default true
+        {full_document}     (boolean)  create query for full document/tree,
+                                       default false
+        {all_captures}      (boolean)  create a capture group for every
+                                       possible combination, default false
+        {include_root_node} (boolean)  include root node, default false
+
+
+
  vim:tw=78:ts=8:ft=help:norl:
