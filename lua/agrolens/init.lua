@@ -122,7 +122,12 @@ M.do_closures = function(
         end
         count = count - num
     elseif level == next_level then
-        content = content .. ")"
+        if captures[level] and captures[level] ~= "@cap" then
+            content = content .. ") " .. captures[level]
+        else
+            content = content .. ") @cap" .. tostring(captureid)
+            captureid = captureid + 1
+        end
         count = count - 1
     end
 
