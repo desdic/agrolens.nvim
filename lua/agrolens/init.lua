@@ -89,6 +89,7 @@ local function escape_pattern(text)
 end
 
 M.do_closures = function(
+    opts,
     block,
     next_node,
     numnodes,
@@ -122,11 +123,15 @@ M.do_closures = function(
         end
         count = count - num
     elseif level == next_level then
-        if captures[level] and captures[level] ~= "@cap" then
-            content = content .. ") " .. captures[level]
+        if opts.all_captures then
+            if captures[level] and captures[level] ~= "@cap" then
+                content = content .. ") " .. captures[level]
+            else
+                content = content .. ") @cap" .. tostring(captureid)
+                captureid = captureid + 1
+            end
         else
-            content = content .. ") @cap" .. tostring(captureid)
-            captureid = captureid + 1
+            content = content .. ")"
         end
         count = count - 1
     end
@@ -249,6 +254,7 @@ M.generate = function(opts)
             M.add_captures(opts, captures, capindex)
 
             content, count, captureid = M.do_closures(
+                opts,
                 block,
                 next_node,
                 numnodes,
