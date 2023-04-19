@@ -20,17 +20,18 @@ M.generate_new_finder({opts})                        *M.generate_new_finder()*
         {sorter}                 (function)  function(line: string) => table
                                              (Optional)
         {same_type}              (bool)      if buffers should be of same
-                                             filetype (default false)
+                                             filetype (default: false)
         {include_hidden_buffers} (bool)      if hidden buffers should be
-                                             included (default false)
+                                             included (default: false)
         {disable_indentation}    (bool)      if true it strips the whitespaces
-                                             (default false)
-        {debug}                  (bool)      enable debugging (default false)
+                                             (default: false)
+        {debug}                  (bool)      enable debugging (default: false)
         {matches}                (table)     key/value pair for matching
-                                             variable names
+                                             variable names (default: {})
         {aliases}                (table)     key/value pair for aliases for
-                                             longer lists of queries (value is
-                                             comma seperated)
+                                             longer lists of queries where
+                                             value is comma seperated
+                                             (default: {})
 
 
 
@@ -46,16 +47,16 @@ M.generate({opts})                                              *M.generate()*
         {opts} (table)  options
 
     Fields: ~
-        {register}          (char)     register to copy to. Default ""
-        {in_buffer}         (boolean)  create a buffer with query, default
-                                       true
-        {in_register}       (boolean)  copy query to register (clipboard),
-                                       default true
-        {full_document}     (boolean)  create query for full document/tree,
-                                       default false
+        {register}          (char)     register to copy to (default: "")
+        {in_buffer}         (boolean)  create a buffer with query (default:
+                                       true)
+        {in_register}       (boolean)  copy query to register/clipboard
+                                       (default: true)
+        {full_document}     (boolean)  create query for full document/tree
+                                       (default: false)
         {all_captures}      (boolean)  create a capture group for every
-                                       possible combination, default false
-        {include_root_node} (boolean)  include root node, default false
+                                       possible combination (default: false)
+        {include_root_node} (boolean)  include root node (default: false)
 
 
 
