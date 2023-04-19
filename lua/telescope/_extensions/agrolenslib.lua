@@ -270,12 +270,12 @@ end
 ---@field cwd string: current root directory (Optional)
 ---@field previewer function: function(line: string) => table (Optional)
 ---@field sorter function: function(line: string) => table (Optional)
----@field same_type bool: if buffers should be of same filetype (default false)
----@field include_hidden_buffers bool: if hidden buffers should be included (default false)
----@field disable_indentation bool: if true it strips the whitespaces (default false)
----@field debug bool: enable debugging (default false)
----@field matches table: key/value pair for matching variable names
----@field aliases table: key/value pair for aliases for longer lists of queries (value is comma seperated)
+---@field same_type bool: if buffers should be of same filetype (default: false)
+---@field include_hidden_buffers bool: if hidden buffers should be included (default: false)
+---@field disable_indentation bool: if true it strips the whitespaces (default: false)
+---@field debug bool: enable debugging (default: false)
+---@field matches table: key/value pair for matching variable names (default: {})
+---@field aliases table: key/value pair for aliases for longer lists of queries where value is comma seperated (default: {})
 M.generate_new_finder = function(opts)
     return finders.new_table({
         results = M._get_captures(opts),

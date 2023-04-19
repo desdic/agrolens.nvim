@@ -201,12 +201,12 @@ end
 --- require("agrolens").generate({in_buffer=false})
 --- </code>
 ---@param opts table: options
----@field register char: register to copy to. Default ""
----@field in_buffer boolean: create a buffer with query, default true
----@field in_register boolean: copy query to register (clipboard), default true
----@field full_document boolean: create query for full document/tree, default false
----@field all_captures boolean: create a capture group for every possible combination, default false
----@field include_root_node boolean: include root node, default false
+---@field register char: register to copy to (default: "")
+---@field in_buffer boolean: create a buffer with query (default: true)
+---@field in_register boolean: copy query to register/clipboard (default: true)
+---@field full_document boolean: create query for full document/tree (default: false)
+---@field all_captures boolean: create a capture group for every possible combination (default: false)
+---@field include_root_node boolean: include root node (default: false)
 M.generate = function(opts)
     local tree = {}
 
