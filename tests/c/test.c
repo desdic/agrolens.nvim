@@ -62,7 +62,11 @@ void print_person(struct Person *p, format_func func) {
   printf("%s is %d days old\n", p->name, (*func)(p));
 }
 
-int main() {
+char **do_nothing(char **argv) {
+  return argv;
+}
+
+int main(int argc, char **argv) {
 
   // Create Donald
   struct Person donald;
