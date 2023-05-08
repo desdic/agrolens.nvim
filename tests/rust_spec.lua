@@ -43,7 +43,7 @@ describe("rust", function()
             'tests/rust/src/main.rs:12:12:            chrono::NaiveDate::parse_from_str(&self.born, "%d-%m-%Y")',
             entries[2])
         assert.equals(
-            "tests/rust/src/main.rs:19:8:        return today.signed_duration_since(borndate).num_days();",
+            "tests/rust/src/main.rs:19:8:        today.signed_duration_since(borndate).num_days()",
             entries[3])
 
         assert.equals(

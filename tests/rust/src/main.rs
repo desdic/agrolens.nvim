@@ -16,7 +16,7 @@ impl Person {
             Utc,
         );
 
-        return today.signed_duration_since(borndate).num_days();
+        today.signed_duration_since(borndate).num_days()
     }
 
     fn print(&self, f: fn(&Person) -> String) {
@@ -30,7 +30,7 @@ Formatting of person
 fn format_person(p: &Person) -> String {
     let age = p.calc_age_in_days();
 
-    return format!("{} is {} days old", p.name, age);
+    format!("{} is {} days old", p.name, age)
 }
 
 fn main() {
