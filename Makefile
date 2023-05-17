@@ -11,5 +11,11 @@ fmt:
 lint:
 	luacheck lua/telescope
 
-docgen:
-	nvim --headless --noplugin -u scripts/minimal_init.vim -c "luafile ./scripts/gendocs.lua" -c 'qa'
+deps:
+	@mkdir -p deps
+	git clone --depth 1 https://github.com/echasnovski/mini.nvim deps/mini.nvim
+
+documentation:
+	nvim --headless --noplugin -u ./scripts/minimal_init_doc.lua -c "lua require('mini.doc').generate()" -c "qa!"
+
+documentation-ci: deps documentation

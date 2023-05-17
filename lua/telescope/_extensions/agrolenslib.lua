@@ -8,16 +8,58 @@ local ppath = require("plenary.path")
 local plenary = require("plenary")
 local utils = require("telescope._extensions.utils")
 
-local M = { log = plenary.log.new({ plugin = "agrolens", level = "info" }) }
+local agrolens =
+    { log = plenary.log.new({ plugin = "agrolens", level = "info" }) }
 
----@brief [[
---- Its an extention for telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope
----@brief ]]
+--- Default telescope options:
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+agrolens.telescope_opts = {
+    -- Enable/Disable debug messages
+    debug = false,
 
----@tag agrolens.nvim
----@config { ["name"] = "INTRODUCTION"}
+    -- Some tree-sitter plugins uses hidden buffers
+    -- and we can enable those to if we want
+    include_hidden_buffers = false,
 
-M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
+    -- Make sure the query only runs on
+    -- same filetype as the current one
+    same_type = true,
+
+    -- Match a given string or object
+    -- Example `:Telescope agrolens query=callings buffers=all same_type=false match=name,object`
+    -- this will query all callings but only those who match the word on the cursor
+    match = nil,
+
+    -- Disable displaying indententations in telescope
+    disable_indentation = false,
+
+    -- Alias can be used to join several queries into a single name
+    -- Example: `aliases = { yamllist = "docker-compose,github-workflow-steps"}`
+    aliases = {},
+
+    -- Several internal functions can also be overwritten
+    --
+    -- Default entry make is the one used for grep
+    -- entry_maker = make_entry.gen_from_vimgrep(opts)
+    --
+    -- Default way of finding current directory
+    -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+    --
+    -- Default previewer
+    -- previewer = conf.grep_previewer(opts)
+    --
+    -- Default sorting
+    -- sorter = conf.generic_sorter(opts)
+}
+--minidoc_afterlines_end
+
+agrolens._create_entry = function(
+    filename,
+    matches,
+    iter_query,
+    bufnr,
+    capture_name
+)
     local entry = {}
     entry.filename = filename
     entry.bufnr = bufnr
@@ -28,7 +70,7 @@ M._create_entry = function(filename, matches, iter_query, bufnr, capture_name)
         local line_text =
             vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1]
 
-        M.log.debug("got", line_text, to, torow)
+        agrolens.log.debug("got", line_text, to, torow)
 
         -- if multiline and its the capture line just include the line
         if to ~= torow and curr_capture_name == "agrolens.scope" then
@@ -80,7 +122,7 @@ local does_match = function(opts, entry)
     return false
 end
 
-M._add_entries = function(
+agrolens._add_entries = function(
     opts,
     entries,
     capture_names,
@@ -100,7 +142,7 @@ M._add_entries = function(
                 pcall(queries.get_query, filetype, "agrolens." .. capture_name)
             if okgetq and iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
-                    local entry = M._create_entry(
+                    local entry = agrolens._create_entry(
                         filename,
                         matches,
                         iter_query,
@@ -126,7 +168,7 @@ M._add_entries = function(
     return entries
 end
 
-M._get_captures = function(opts)
+agrolens._get_captures = function(opts)
     local entries = {}
 
     for _, bufnr in ipairs(opts.bufids) do
@@ -135,7 +177,7 @@ M._get_captures = function(opts)
         local filetype = vim.filetype.match({ buf = bufnr })
 
         if filetype and filetype ~= "" then
-            entries = M._add_entries(
+            entries = agrolens._add_entries(
                 opts,
                 entries,
                 opts.queries,
@@ -148,7 +190,7 @@ M._get_captures = function(opts)
     return entries
 end
 
-M._make_bufferlist = function(opts)
+agrolens._make_bufferlist = function(opts)
     local buffers = {}
 
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
@@ -173,7 +215,7 @@ local function split(source, delimiters)
     local pattern = "([^" .. delimiters .. "]+)"
     --- Keep linter happy
     local _ = string.gsub(source, pattern, function(value)
-        elements[#elements + 1] = value
+        elements[vim.tbl_count(elements) + 1] = value
     end)
     return elements
 end
@@ -193,31 +235,23 @@ local function get_word_at_cursor()
     return left .. right
 end
 
-M._sanitize_opts = function(opts)
-    local querylist = {}
+agrolens._sanitize_opts = function(opts)
+    opts.queries = {}
 
-    local aliases = M.telescope_config.aliases or {}
-    opts.query = aliases[opts.query] or opts.query
+    opts = vim.tbl_deep_extend(
+        "force",
+        agrolens.telescope_opts,
+        opts or {},
+        agrolens.telescope_config
+    )
+
+    opts.query = opts.aliases[opts.query] or opts.query
 
     if opts.query then
         for query in opts.query:gmatch("[^,%s]+") do
-            table.insert(querylist, query)
+            table.insert(opts.queries, query)
         end
     end
-    opts.queries = querylist
-
-    local include_hidden_buffers = M.telescope_config.include_hidden_buffers
-        or false
-    if opts.include_hidden_buffers == true then
-        include_hidden_buffers = true
-    end
-    opts.include_hidden_buffers = include_hidden_buffers
-
-    local same_type = M.telescope_config.same_type
-    if opts.same_type == false then
-        same_type = false
-    end
-    opts.same_type = same_type
 
     local matches = {}
     if opts.match then
@@ -226,7 +260,7 @@ M._sanitize_opts = function(opts)
         for match in opts.match:gmatch("[^,%s]+") do
             local elements = split(match, "=")
 
-            if #elements == 1 then
+            if vim.tbl_count(elements) == 1 then
                 table.insert(elements, current_work)
             end
 
@@ -238,16 +272,17 @@ M._sanitize_opts = function(opts)
         end
     end
 
-    opts.disable_indentation = M.telescope_config.disable_indentation or false
+    opts.disable_indentation = agrolens.telescope_config.disable_indentation
+        or false
 
-    if #matches > 0 then
+    if not vim.tbl_isempty(matches) then
         opts.matches = matches
     end
 
     return opts
 end
 
-M._get_buffers = function(opts)
+agrolens._get_buffers = function(opts)
     local curbuf = vim.api.nvim_get_current_buf()
 
     opts.cur_type = vim.filetype.match({ buf = curbuf })
@@ -256,7 +291,7 @@ M._get_buffers = function(opts)
     if opts.buffers and type(opts.buffers) == "string" then
         if opts.buffers == "all" then
             bufids[curbuf] = nil
-            bufids = M._make_bufferlist(opts)
+            bufids = agrolens._make_bufferlist(opts)
         end
     end
     opts.bufids = bufids
@@ -264,47 +299,20 @@ M._get_buffers = function(opts)
     return opts
 end
 
---- Generate a new finder for telescope
----@param opts table: options
----@field entry_maker function: function(line: string) => table (Optional)
----@field cwd string: current root directory (Optional)
----@field previewer function: function(line: string) => table (Optional)
----@field sorter function: function(line: string) => table (Optional)
----@field same_type bool: if buffers should be of same filetype (default: false)
----@field include_hidden_buffers bool: if hidden buffers should be included (default: false)
----@field disable_indentation bool: if true it strips the whitespaces (default: false)
----@field debug bool: enable debugging (default: false)
----@field matches table: key/value pair for matching variable names (default: {})
----@field aliases table: key/value pair for aliases for longer lists of queries where value is comma seperated (default: {})
-M.generate_new_finder = function(opts)
+agrolens.generate_new_finder = function(opts)
     return finders.new_table({
-        results = M._get_captures(opts),
+        results = agrolens._get_captures(opts),
         entry_maker = opts.entry_maker,
     })
 end
 
-M.__check_deprecated = function(opts)
-    if M.telescope_config.disableindentation or opts.disableindentation then
-        M.log.warn("disableindentation deprecated use disable_indentation")
-    end
-    if M.telescope_config.sametype or opts.sametype then
-        M.log.warn("sametype is deprecated use same_type")
-    end
-    if M.telescope_config.includehiddenbuffers or opts.includehiddenbuffers then
-        M.log.warn(
-            "includehiddenbuffers is deprecated use include_hidden_buffers"
-        )
-    end
-end
-
-M.run = function(opts)
+agrolens.run = function(opts)
     opts = opts or {}
 
-    M.__check_deprecated(opts)
-    opts = M._sanitize_opts(opts)
+    opts = agrolens._sanitize_opts(opts)
 
-    if not M.log then
-        M.log = plenary.log.new({ plugin = "agrolens", level = "info" })
+    if not agrolens.log then
+        agrolens.log = plenary.log.new({ plugin = "agrolens", level = "info" })
     end
 
     if opts.query then
@@ -312,12 +320,12 @@ M.run = function(opts)
         opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
         opts.previewer = opts.previewer or conf.grep_previewer(opts)
         opts.sorter = opts.sorter or conf.generic_sorter(opts)
-        opts = M._get_buffers(opts)
+        opts = agrolens._get_buffers(opts)
 
         pickers
             .new(opts, {
                 prompt_title = "Search",
-                finder = M.generate_new_finder(opts),
+                finder = agrolens.generate_new_finder(opts),
                 previewer = opts.previewer,
                 sorter = opts.sorter,
                 attach_mappings = function(_, map)
@@ -329,4 +337,4 @@ M.run = function(opts)
     end
 end
 
-return M
+return agrolens
