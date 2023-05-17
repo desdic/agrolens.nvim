@@ -1,63 +1,125 @@
-================================================================================
-INTRODUCTION                                                     *agrolens.nvim*
+==============================================================================
+------------------------------------------------------------------------------
+                                                                 *agrolens.nvim*
 
-Its an extention for telescope that runs pre-defined (or custom) tree-sitter
-queries on a buffer (or all buffers) and gives a quick view via telescope
+Agrolens is an extention for telescope that runs pre-defined (or custom)
+tree-sitter queries on a buffer (or all buffers) and gives a quick
+view via telescope.
 
-M.generate_new_finder({opts})                        *M.generate_new_finder()*
-    Generate a new finder for telescope
+Usage~
+Using Lazy plugin manager
+
+{
+    "desdic/agrolens.nvim",
+    event = "VeryLazy",
+    keys = {
+        {
+            "ag",
+            function()
+                require("agrolens").generate({})
+            end,
+        },
+    },
+},`
+
+Enabling telescope extension (and default options)
+Options can be overwritten when calling the extension
+See |agrolens.telescope_opts| for options
+>
+require("telescope").extensions = {
+    agrolens = {
+       same_type = true,
+    }
+}
+
+Agrolens also has the ability to generate a tree-sitter query from
+a given cursor postion.
+
+------------------------------------------------------------------------------
+                                                                 *agrolens.opts*
+                                `agrolens.opts`
+Default options when generation a query:
+>
+  agrolens.opts = {
+      -- Register to copy to
+      register = "",
+
+      -- Create a buffer with query
+      in_buffer = true,
+
+      -- Copy query to register
+      in_register = true,
+
+      -- Generate query for full document/tree
+      full_document = false,
+
+      -- Generate all captures
+      -- WARNING if the tree is big
+      -- it can crash neovims playground
+      all_captures = false,
+
+      -- Include root node
+      include_root_node = false,
+  }
+<
+
+------------------------------------------------------------------------------
+                                                           *agrolens.generate()*
+                          `agrolens.generate`({opts})
+Generate treesitter query
+
+Parameters~
+{opts} `(table)` Options for generating query.
+
+Usage~
+`require('agrolens').generate({})`
 
 
-    Parameters: ~
-        {opts} (table)  options
+==============================================================================
+------------------------------------------------------------------------------
+                                                       *agrolens.telescope_opts*
+                           `agrolens.telescope_opts`
+Default telescope options:
+>
+  agrolens.telescope_opts = {
+      -- Enable/Disable debug messages
+      debug = false,
 
-    Fields: ~
-        {entry_maker}            (function)  function(line: string) => table
-                                             (Optional)
-        {cwd}                    (string)    current root directory (Optional)
-        {previewer}              (function)  function(line: string) => table
-                                             (Optional)
-        {sorter}                 (function)  function(line: string) => table
-                                             (Optional)
-        {same_type}              (bool)      if buffers should be of same
-                                             filetype (default: false)
-        {include_hidden_buffers} (bool)      if hidden buffers should be
-                                             included (default: false)
-        {disable_indentation}    (bool)      if true it strips the whitespaces
-                                             (default: false)
-        {debug}                  (bool)      enable debugging (default: false)
-        {matches}                (table)     key/value pair for matching
-                                             variable names (default: {})
-        {aliases}                (table)     key/value pair for aliases for
-                                             longer lists of queries where
-                                             value is comma seperated
-                                             (default: {})
+      -- Some tree-sitter plugins uses hidden buffers
+      -- and we can enable those to if we want
+      include_hidden_buffers = false,
 
+      -- Make sure the query only runs on
+      -- same filetype as the current one
+      same_type = true,
 
+      -- Match a given string or object
+      -- Example `:Telescope agrolens query=callings buffers=all same_type=false match=name,object`
+      -- this will query all callings but only those who match the word on the cursor
+      match = nil,
 
-================================================================================
-M.generate({opts})                                              *M.generate()*
-    Generate a query from cursor position Example usage:
-    >
-    require("agrolens").generate({in_buffer=false})
+      -- Disable displaying indententations in telescope
+      disable_indentation = false,
+
+      -- Alias can be used to join several queries into a single name
+      -- Example: `aliases = { yamllist = "docker-compose,github-workflow-steps"}`
+      aliases = {},
+
+      -- Several internal functions can also be overwritten
+      --
+      -- Default entry make is the one used for grep
+      -- entry_maker = make_entry.gen_from_vimgrep(opts)
+      --
+      -- Default way of finding current directory
+      -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+      --
+      -- Default previewer
+      -- previewer = conf.grep_previewer(opts)
+      --
+      -- Default sorting
+      -- sorter = conf.generic_sorter(opts)
+  }
 <
 
 
-    Parameters: ~
-        {opts} (table)  options
-
-    Fields: ~
-        {register}          (char)     register to copy to (default: "")
-        {in_buffer}         (boolean)  create a buffer with query (default:
-                                       true)
-        {in_register}       (boolean)  copy query to register/clipboard
-                                       (default: true)
-        {full_document}     (boolean)  create query for full document/tree
-                                       (default: false)
-        {all_captures}      (boolean)  create a capture group for every
-                                       possible combination (default: false)
-        {include_root_node} (boolean)  include root node (default: false)
-
-
-
- vim:tw=78:ts=8:ft=help:norl:
+ vim:tw=78:ts=8:noet:ft=help:norl:
