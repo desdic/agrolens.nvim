@@ -1,4 +1,64 @@
-local M = {}
+---
+--- Agrolens is an extention for telescope that runs pre-defined (or custom)
+--- tree-sitter queries on a buffer (or all buffers) and gives a quick
+--- view via telescope.
+---
+---@usage Using Lazy plugin manager
+---
+--- {
+---     "desdic/agrolens.nvim",
+---     event = "VeryLazy",
+---     keys = {
+---         {
+---             "ag",
+---             function()
+---                 require("agrolens").generate({})
+---             end,
+---         },
+---     },
+--- },`
+---
+--- Enabling telescope extension (and default options)
+--- Options can be overwritten when calling the extension
+--- See |agrolens.telescope_opts| for options
+--- >
+--- require("telescope").extensions = {
+---     agrolens = {
+---        same_type = true,
+---     }
+--- }
+---
+--- Agrolens also has the ability to generate a tree-sitter query from
+--- a given cursor postion.
+---@tag agrolens.nvim
+
+-- Module definition ==========================================================
+local agrolens = {}
+
+--- Default options when generation a query:
+---@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
+agrolens.opts = {
+    -- Register to copy to
+    register = "",
+
+    -- Create a buffer with query
+    in_buffer = true,
+
+    -- Copy query to register
+    in_register = true,
+
+    -- Generate query for full document/tree
+    full_document = false,
+
+    -- Generate all captures
+    -- WARNING if the tree is big
+    -- it can crash neovims playground
+    all_captures = false,
+
+    -- Include root node
+    include_root_node = false,
+}
+--minidoc_afterlines_end
 
 local ts_utils = require("nvim-treesitter.ts_utils")
 local agroutils = require("telescope._extensions.utils")
@@ -44,7 +104,7 @@ local is_same = function(node1, node2)
     return false
 end
 
-M.create_entry = function(node, level)
+agrolens.create_entry = function(node, level)
     local node_type = node:type()
     local node_text = vim.treesitter.get_node_text(node, 0)
     local field_name = get_field_name(node)
@@ -59,10 +119,10 @@ M.create_entry = function(node, level)
     return entry
 end
 
-M.traverse = function(results, node, cur_node, level)
+agrolens.traverse = function(results, node, cur_node, level)
     local entry = {}
     if is_same(node, cur_node) then
-        entry = M.create_entry(node, level)
+        entry = agrolens.create_entry(node, level)
 
         table.insert(results, entry)
 
@@ -71,11 +131,12 @@ M.traverse = function(results, node, cur_node, level)
 
     if node ~= nil then
         if node:named() then
-            entry = M.create_entry(node, level)
+            entry = agrolens.create_entry(node, level)
             table.insert(results, entry)
 
             for next_node, _ in node:iter_children() do
-                local done = M.traverse(results, next_node, cur_node, level + 1)
+                local done =
+                    agrolens.traverse(results, next_node, cur_node, level + 1)
                 if done then
                     return true
                 end
@@ -88,7 +149,7 @@ local function escape_pattern(text)
     return text:gsub("([^%w])", "%%%1")
 end
 
-M.do_closures = function(
+agrolens.do_closures = function(
     opts,
     block,
     next_node,
@@ -139,9 +200,9 @@ M.do_closures = function(
     return content, count, captureid
 end
 
-M.end_closures = function(list, captures, count, captureid)
+agrolens.end_closures = function(list, captures, count, captureid)
     if count > 0 then
-        local index = #list
+        local index = vim.tbl_count(list)
         for x = 1, count do
             list[index] = list[index] .. ")"
             if captures[x] then
@@ -159,13 +220,13 @@ M.end_closures = function(list, captures, count, captureid)
     end
 end
 
-M.add_captures = function(opts, captures, capindex)
+agrolens.add_captures = function(opts, captures, capindex)
     if not captures[capindex] and opts.all_captures then
         captures[capindex] = "@cap"
     end
 end
 
-M.match_line = function(block, line, captures, capindex)
+agrolens.match_line = function(block, line, captures, capindex)
     local pattern = "^%s*"
         .. escape_pattern(agroutils.ltrim(block.node_text))
         .. "$"
@@ -176,7 +237,7 @@ M.match_line = function(block, line, captures, capindex)
     end
 end
 
-M.create_content = function(block, node_match, captures, capindex)
+agrolens.create_content = function(block, node_match, captures, capindex)
     local content = ""
 
     if block.field_name then
@@ -195,29 +256,15 @@ M.create_content = function(block, node_match, captures, capindex)
     return content
 end
 
---- Generate a query from cursor position
---- Example usage:
---- <code>
---- require("agrolens").generate({in_buffer=false})
---- </code>
----@param opts table: options
----@field register char: register to copy to (default: "")
----@field in_buffer boolean: create a buffer with query (default: true)
----@field in_register boolean: copy query to register/clipboard (default: true)
----@field full_document boolean: create query for full document/tree (default: false)
----@field all_captures boolean: create a capture group for every possible combination (default: false)
----@field include_root_node boolean: include root node (default: false)
-M.generate = function(opts)
+--- Generate treesitter query
+---
+---@param opts table Options for generating query.
+---
+---@usage `require('agrolens').generate({})`
+agrolens.generate = function(opts)
     local tree = {}
 
-    if not opts.register then
-        opts.register = ""
-    end
-
-    if not opts.in_buffer and not opts.in_register then
-        opts.in_buffer = true
-        opts.in_register = true
-    end
+    opts = vim.tbl_deep_extend("force", agrolens.opts, opts or {})
 
     local line = vim.api.nvim_get_current_line()
     local cur_node = ts_utils.get_node_at_cursor()
@@ -233,12 +280,12 @@ M.generate = function(opts)
         end
     end
 
-    M.traverse(tree, from_node, cur_node, 0)
+    agrolens.traverse(tree, from_node, cur_node, 0)
 
     local list = {}
     local captures = {}
     local count = 0
-    local numnodes = #tree
+    local numnodes = vim.tbl_count(tree)
     local captureid = 1
 
     for i, block in ipairs(tree) do
@@ -247,13 +294,13 @@ M.generate = function(opts)
             local next_node = tree[i + 1]
 
             local content =
-                M.create_content(block, node_match, captures, capindex)
+                agrolens.create_content(block, node_match, captures, capindex)
             count = count + 1
 
-            M.match_line(block, line, captures, capindex)
-            M.add_captures(opts, captures, capindex)
+            agrolens.match_line(block, line, captures, capindex)
+            agrolens.add_captures(opts, captures, capindex)
 
-            content, count, captureid = M.do_closures(
+            content, count, captureid = agrolens.do_closures(
                 opts,
                 block,
                 next_node,
@@ -268,9 +315,9 @@ M.generate = function(opts)
         end
     end
 
-    M.end_closures(list, captures, count, captureid)
+    agrolens.end_closures(list, captures, count, captureid)
 
-    if #list > 0 then
+    if not vim.tbl_isempty(list) then
         if opts.in_register then
             vim.fn.setreg(opts.register, list, "l")
         end
@@ -282,4 +329,5 @@ M.generate = function(opts)
         end
     end
 end
-return M
+
+return agrolens
