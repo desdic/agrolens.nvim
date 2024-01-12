@@ -8,7 +8,7 @@ vim.cmd [[au BufRead,BufNewFile *.gleam set filetype=gleam]]
 vim.o.swapfile = false
 vim.bo.swapfile = false
 
-require("nvim-treesitter.configs").setup {
-    indent = { enable = true },
-    highlight = { enable = true },
-}
+-- require("nvim-treesitter.configs").setup {
+--     indent = { enable = true },
+--     highlight = { enable = true },
+-- }
