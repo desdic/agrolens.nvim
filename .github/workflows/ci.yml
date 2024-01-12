@@ -17,11 +17,11 @@ jobs:
             manager: sudo apt-get
             packages: -y make lua-check
           - os: ubuntu-20.04
-            url: https://github.com/neovim/neovim/releases/download/v0.8.3/nvim-linux64.tar.gz
+            url: https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
           - os: ubuntu-20.04
-            url: https://github.com/neovim/neovim/releases/download/v0.8.0/nvim-linux64.tar.gz
+            url: https://github.com/neovim/neovim/releases/download/v0.9.4/nvim-linux64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
     steps:
