@@ -9,7 +9,6 @@
 | glsl | x | x | x |
 | go | x | x | x |
 | lua | x | x | x
-| perl | x | x | x
 | php | x | x* | x
 | python | x | x | x
 | ruby | x | x | x

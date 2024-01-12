@@ -1,2 +1,2 @@
 (comment) @agrolens.scope
-(expression_statement (string string_content:(string_content))) @arolens.scope
+(expression_statement (string (string_start) (string_content))) @arolens.scope
