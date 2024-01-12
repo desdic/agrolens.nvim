@@ -109,7 +109,7 @@ Some file formats just doesn't fit into the category labels so custom ones have 
 
 ## Custom queries
 
-You can place your custom queries in `~/.config/nvim/queries` you can load them just as with the build-in queries. So adding `myspecial.scm` as `~/.config/nvim/queries/c/myspecial.scm` enables you to run
+You can place your custom queries in `~/.config/nvim/queries` you can load them just as with the build-in queries. So adding `myspecial` as `~/.config/nvim/queries/c/agrolens.myspecial.scm` enables you to run
 
 ```
 :Telescope agrolens query=myspecial

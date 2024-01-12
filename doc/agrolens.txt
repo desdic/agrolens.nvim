@@ -6,7 +6,7 @@ Agrolens is an extention for telescope that runs pre-defined (or custom)
 tree-sitter queries on a buffer (or all buffers) and gives a quick
 view via telescope.
 
-Usage~
+Usage ~
 Using Lazy plugin manager
 
 {
@@ -68,10 +68,10 @@ Default options when generation a query:
                           `agrolens.generate`({opts})
 Generate treesitter query
 
-Parameters~
+Parameters ~
 {opts} `(table)` Options for generating query.
 
-Usage~
+Usage ~
 `require('agrolens').generate({})`
 
 

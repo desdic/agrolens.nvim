@@ -3,7 +3,6 @@ local finders = require("telescope.finders")
 local make_entry = require("telescope.make_entry")
 local actions = require("telescope.actions")
 local conf = require("telescope.config").values
-local queries = require("nvim-treesitter.query")
 local ppath = require("plenary.path")
 local plenary = require("plenary")
 local utils = require("telescope._extensions.utils")
@@ -138,9 +137,8 @@ agrolens._add_entries = function(
         local root = trees[1]:root()
 
         for _, capture_name in ipairs(capture_names) do
-            local okgetq, iter_query =
-                pcall(queries.get_query, filetype, "agrolens." .. capture_name)
-            if okgetq and iter_query then
+            local iter_query =  vim.treesitter.query.get(filetype, "agrolens." .. capture_name)
+            if iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = agrolens._create_entry(
                         filename,
