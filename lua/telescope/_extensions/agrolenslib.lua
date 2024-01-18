@@ -137,7 +137,8 @@ agrolens._add_entries = function(
         local root = trees[1]:root()
 
         for _, capture_name in ipairs(capture_names) do
-            local iter_query =  vim.treesitter.query.get(filetype, "agrolens." .. capture_name)
+            local iter_query =
+                vim.treesitter.query.get(filetype, "agrolens." .. capture_name)
             if iter_query then
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = agrolens._create_entry(
@@ -164,6 +165,71 @@ agrolens._add_entries = function(
         end
     end
     return entries
+end
+
+agrolens.jump_next = function(curline, jumplist)
+    table.sort(jumplist)
+    for _, line in pairs(jumplist) do
+        if line > curline then
+            vim.api.nvim_win_set_cursor(0, { line, 0 })
+            break
+        end
+    end
+end
+
+agrolens.jump_prev = function(curline, jumplist)
+    table.sort(jumplist, function(a, b)
+        return a > b
+    end)
+    for _, line in pairs(jumplist) do
+        if line < curline then
+            vim.api.nvim_win_set_cursor(0, { line, 0 })
+            break
+        end
+    end
+end
+
+local hash_keys_to_list = function(entries)
+    local list = {}
+    for k, _ in pairs(entries) do
+        table.insert(list, k)
+    end
+    return list
+end
+
+agrolens._generate_jump_list = function(opts)
+    local entries = {}
+    local ts = vim.treesitter
+    local capture_names = opts.queries
+    local bufnr = 0
+    local filetype = vim.filetype.match({ buf = bufnr })
+    if filetype and filetype ~= "" then
+        local ok, tsparser = pcall(ts.get_parser, bufnr, filetype)
+        if ok and tsparser and type(tsparser) ~= "string" then
+            local trees = tsparser:parse()
+            local root = trees[1]:root()
+
+            for _, capture_name in ipairs(capture_names) do
+                local iter_query = vim.treesitter.query.get(
+                    filetype,
+                    "agrolens." .. capture_name
+                )
+                if iter_query then
+                    for _, matches, _ in iter_query:iter_matches(root, bufnr) do
+                        for i, _ in pairs(matches) do
+                            local curr_capture_name = iter_query.captures[i]
+                            local lnum, _, _, _ = matches[i]:range()
+                            if curr_capture_name == "agrolens.scope" then
+                                entries[lnum + 1] = true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return hash_keys_to_list(entries)
 end
 
 agrolens._get_captures = function(opts)
@@ -320,18 +386,29 @@ agrolens.run = function(opts)
         opts.sorter = opts.sorter or conf.generic_sorter(opts)
         opts = agrolens._get_buffers(opts)
 
-        pickers
-            .new(opts, {
-                prompt_title = "Search",
-                finder = agrolens.generate_new_finder(opts),
-                previewer = opts.previewer,
-                sorter = opts.sorter,
-                attach_mappings = function(_, map)
-                    map("i", "<c-space>", actions.to_fuzzy_refine)
-                    return true
-                end,
-            })
-            :find()
+        if opts.jump then
+            local jumplist = agrolens._generate_jump_list(opts)
+            local curline = vim.api.nvim_win_get_cursor(0)[1]
+
+            if opts.jump == "next" then
+                agrolens.jump_next(curline, jumplist)
+            elseif opts.jump == "prev" then
+                agrolens.jump_prev(curline, jumplist)
+            end
+        else
+            pickers
+                .new(opts, {
+                    prompt_title = "Search",
+                    finder = agrolens.generate_new_finder(opts),
+                    previewer = opts.previewer,
+                    sorter = opts.sorter,
+                    attach_mappings = function(_, map)
+                        map("i", "<c-space>", actions.to_fuzzy_refine)
+                        return true
+                    end,
+                })
+                :find()
+        end
     end
 end
 
