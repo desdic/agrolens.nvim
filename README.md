@@ -61,13 +61,14 @@ require("telescope").extensions = {
 
 | Parameter | Value(s) | Description |
 | :-- | :--| :---------- |
-| aliases | empty | Create aliases for longer lists of queries |
-| query | functions,callings,comments,labels | A comma seperated list with queries you want to run |
-| buffers | all | Run queries on all buffers | 
-| disable_indentation | true/false(default) | Strips spaces from line when showing in telescope |
-| include_hidden_buffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true |
-| match | name and string | Matches a variable (minus the agrolens namespace) from the query with a string. If no string is provided its the word where the cursor is |
-| same_type | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like |
+| aliases | empty | Create aliases for longer lists of queries. |
+| query | functions,callings,comments,labels | A comma seperated list with queries you want to run. |
+| buffers | all | Run queries on all buffers. | 
+| disable_indentation | true/false(default) | Strips spaces from line when showing in telescope. |
+| include_hidden_buffers | true/false(default) | when all buffers are selected only the visible are shown unless `includehiddenbuffers` is true. |
+| match | name and string | Matches a variable (minus the agrolens namespace) from the query with a string. If no string is provided its the word where the cursor is. |
+| same_type | true(default)/false | default we only match on same filetype across buffers but you can run queries on all if you like. |
+| jump | next/prev | Jump to the next or previous match of `agrolens.scope` based in query input. Only works on current buffer. |
 
 
 Examples
@@ -102,6 +103,28 @@ Same query as above but `agrolens.name` must by either main or myfunc
 ```
 :Telescope agrolens query=functions buffers=all match=name=main,name=myfunc
 ```
+
+Jump to next match in query `work`
+
+```
+:Telescope agrolens query=work jump=next
+```
+
+## Aliases
+
+Using aliases its possible to create a new query name where its a list of other queries like
+
+```
+agrolens = {
+...
+    aliases = {
+        yamllist = "docker-compose,github-workflow-steps",
+        work = "cheflxchost,github-workflow-steps,pytest",
+    },
+},
+```
+
+Using the query `yamllist` makes a combination of docker-compose, github-workflow-steps queries.
 
 ## Json/Yaml/etc
 
