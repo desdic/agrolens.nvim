@@ -19,13 +19,13 @@ describe("lua", function()
 
         -- functions
         assert.equals(#entries, 5)
-        assert.equals("tests/lua/test.lua:1:0:local hello1 = function()",
+        assert.equals("test.lua:1:0:local hello1 = function()",
                       entries[1])
-        assert.equals("tests/lua/test.lua:5:0:hello2 = function()", entries[2])
-        assert.equals("tests/lua/test.lua:9:0:function hello3()", entries[3])
-        assert.equals("tests/lua/test.lua:19:0:M.hello4 = function()",
+        assert.equals("test.lua:5:0:hello2 = function()", entries[2])
+        assert.equals("test.lua:9:0:function hello3()", entries[3])
+        assert.equals("test.lua:19:0:M.hello4 = function()",
                       entries[4])
-        assert.equals("tests/lua/test.lua:23:0:function M.hello5()", entries[5])
+        assert.equals("test.lua:23:0:function M.hello5()", entries[5])
     end)
 
     it("callings", function()
@@ -35,8 +35,8 @@ describe("lua", function()
         })
 
         assert.equals(#entries, 10)
-        assert.equals('tests/lua/test.lua:2:4:    print("hello1")', entries[1])
-        assert.equals('tests/lua/test.lua:6:4:    print("hello2")', entries[2])
+        assert.equals('test.lua:2:4:    print("hello1")', entries[1])
+        assert.equals('test.lua:6:4:    print("hello2")', entries[2])
     end)
 
     it("comments", function()
@@ -46,7 +46,7 @@ describe("lua", function()
         })
 
         assert.equals(#entries, 2)
-        assert.equals("tests/lua/test.lua:13:0:-- Local object", entries[1])
-        assert.equals("tests/lua/test.lua:16:0:--[[", entries[2])
+        assert.equals("test.lua:13:0:-- Local object", entries[1])
+        assert.equals("test.lua:16:0:--[[", entries[2])
     end)
 end)

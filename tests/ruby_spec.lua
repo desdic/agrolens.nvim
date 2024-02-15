@@ -3,7 +3,7 @@ describe("ruby", function()
     local buffers = nil
 
     it("load", function()
-        vim.cmd.edit("tests/ruby/test.rb")
+        vim.cmd.edit("test.rb")
         buffers = vim.api.nvim_list_bufs()
         assert.equal(#buffers, 1)
 
@@ -18,16 +18,16 @@ describe("ruby", function()
         })
 
         assert.equals(#entries, 6)
-        assert.equals("tests/ruby/test.rb:7:2:  attr_reader :born, :name",
+        assert.equals("test.rb:7:2:  attr_reader :born, :name",
                       entries[1])
-        assert.equals("tests/ruby/test.rb:9:2:  def initialize(born, name)",
+        assert.equals("test.rb:9:2:  def initialize(born, name)",
                       entries[2])
-        assert.equals("tests/ruby/test.rb:15:0:def wrapped_string(dist)",
+        assert.equals("test.rb:15:0:def wrapped_string(dist)",
                       entries[3])
-        assert.equals("tests/ruby/test.rb:19:0:def to_string(dist)", entries[4])
-        assert.equals("tests/ruby/test.rb:23:0:def print_intro", entries[5])
+        assert.equals("test.rb:19:0:def to_string(dist)", entries[4])
+        assert.equals("test.rb:23:0:def print_intro", entries[5])
         assert.equals(
-            "tests/ruby/test.rb:30:0:def days_since_birth(born, convf = method(:wrapped_string))",
+            "test.rb:30:0:def days_since_birth(born, convf = method(:wrapped_string))",
             entries[6])
     end)
 
@@ -38,10 +38,10 @@ describe("ruby", function()
         })
 
         assert.equals(#entries, 14)
-        assert.equals("tests/ruby/test.rb:3:0:require 'date'", entries[1])
-        assert.equals("tests/ruby/test.rb:7:2:  attr_reader :born, :name",
+        assert.equals("test.rb:3:0:require 'date'", entries[1])
+        assert.equals("test.rb:7:2:  attr_reader :born, :name",
                       entries[2])
-        assert.equals('tests/ruby/test.rb:16:8:  "[#{dist.to_i}]"', entries[3])
+        assert.equals('test.rb:16:8:  "[#{dist.to_i}]"', entries[3])
     end)
 
     it("comments", function()
@@ -51,9 +51,9 @@ describe("ruby", function()
         })
 
         assert.equals(#entries, 3)
-        assert.equals("tests/ruby/test.rb:1:0:# frozen_string_literal: true",
+        assert.equals("test.rb:1:0:# frozen_string_literal: true",
                       entries[1])
-        assert.equals("tests/ruby/test.rb:5:0:# A person", entries[2])
-        assert.equals("tests/ruby/test.rb:27:0:=begin", entries[3])
+        assert.equals("test.rb:5:0:# A person", entries[2])
+        assert.equals("test.rb:27:0:=begin", entries[3])
     end)
 end)

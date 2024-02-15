@@ -17,9 +17,9 @@ describe("markdown", function()
 
         -- labels
         assert.equals(#entries, 4)
-        assert.equals("tests/markdown/note.md:1:0:# Heading#1", entries[1])
-        assert.equals("tests/markdown/note.md:3:0:## Heading#2.1", entries[2])
-        assert.equals("tests/markdown/note.md:5:0:## Heading#2.2", entries[3])
-        assert.equals("tests/markdown/note.md:7:0:### Heading#3", entries[4])
+        assert.equals("note.md:1:0:# Heading#1", entries[1])
+        assert.equals("note.md:3:0:## Heading#2.1", entries[2])
+        assert.equals("note.md:5:0:## Heading#2.2", entries[3])
+        assert.equals("note.md:7:0:### Heading#3", entries[4])
     end)
 end)

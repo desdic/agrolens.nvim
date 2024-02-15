@@ -130,6 +130,9 @@ agrolens._add_entries = function(
     filetype
 )
     local ts = vim.treesitter
+    if opts.buffers ~= "all" then
+        filename = vim.fs.basename(filename)
+    end
     local dublicates = {}
     local ok, tsparser = pcall(ts.get_parser, bufnr, filetype)
     if ok and tsparser and type(tsparser) ~= "string" then
