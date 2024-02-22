@@ -20,6 +20,16 @@ local setup = function(ext_config, _)
     end
 
     agrolens.telescope_config = ext_config
+
+    if agrolens.telescope_config.disable_devicons ~= false then
+        local has_devicons
+        has_devicons, agrolens.devicons = pcall(require, "nvim-web-devicons")
+        if has_devicons then
+            if not agrolens.devicons.has_loaded() then
+                agrolens.devicons.setup()
+            end
+        end
+    end
 end
 
 return telescope.register_extension({
