@@ -107,8 +107,8 @@ Default telescope options:
 
       -- Several internal functions can also be overwritten
       --
-      -- Default entry make is the one used for grep
-      -- entry_maker = make_entry.gen_from_vimgrep(opts)
+      -- Default entry maker
+      -- entry_maker = agrolens.entry_maker
       --
       -- Default way of finding current directory
       -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
@@ -118,6 +118,15 @@ Default telescope options:
       --
       -- Default sorting
       -- sorter = conf.generic_sorter(opts)
+
+      -- Default enable devicons
+      disable_devicons = false,
+
+      -- display length
+      display_width = 150,
+
+      -- force long path name even when only a single buffer
+      force_long_filepath = false,
   }
 <
 

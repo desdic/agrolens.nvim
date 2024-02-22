@@ -1,11 +1,11 @@
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
-local make_entry = require("telescope.make_entry")
 local actions = require("telescope.actions")
 local conf = require("telescope.config").values
 local ppath = require("plenary.path")
 local plenary = require("plenary")
 local utils = require("telescope._extensions.utils")
+local entry_display = require("telescope.pickers.entry_display")
 
 local agrolens =
     { log = plenary.log.new({ plugin = "agrolens", level = "info" }) }
@@ -38,8 +38,8 @@ agrolens.telescope_opts = {
 
     -- Several internal functions can also be overwritten
     --
-    -- Default entry make is the one used for grep
-    -- entry_maker = make_entry.gen_from_vimgrep(opts)
+    -- Default entry maker
+    -- entry_maker = agrolens.entry_maker
     --
     -- Default way of finding current directory
     -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
@@ -49,6 +49,15 @@ agrolens.telescope_opts = {
     --
     -- Default sorting
     -- sorter = conf.generic_sorter(opts)
+
+    -- Default enable devicons
+    disable_devicons = false,
+
+    -- display length
+    display_width = 150,
+
+    -- force long path name even when only a single buffer
+    force_long_filepath = false,
 }
 --minidoc_afterlines_end
 
@@ -152,12 +161,12 @@ agrolens._add_entries = function(
                     if opts.disable_indentation then
                         entry.line = utils.all_trim(entry.line)
                     end
-                    local formated_entry = format_entry(entry)
 
+                    local formated_entry = format_entry(entry)
                     if not dublicates[formated_entry] then
                         dublicates[formated_entry] = true
                         if does_match(opts, entry) then
-                            table.insert(entries, formated_entry)
+                            table.insert(entries, entry)
                         end
                     end
                 end
@@ -363,6 +372,68 @@ agrolens._get_buffers = function(opts)
     return opts
 end
 
+agrolens.entry_maker = function(entry)
+    local basename = vim.fs.basename(entry.filename)
+
+    local icon = ""
+    local icon_width = 0
+    local hl_group
+
+    if agrolens.telescope_config.disable_devicons ~= true then
+        icon, hl_group = agrolens.devicons.get_icon(
+            basename,
+            utils.file_extension(basename),
+            { default = false }
+        )
+        icon_width = 2
+    end
+
+    print(vim.inspect(agrolens.telescope_opts.force_long_filepath))
+    local fname = entry.filename
+    if
+        agrolens.cur_opts.buffers ~= "all"
+        and agrolens.telescope_opts.force_long_filepath ~= true
+    then
+        fname = vim.fs.basename(fname)
+    end
+
+    local line = fname
+        .. ":"
+        .. entry.lnum
+        .. ":"
+        .. entry.col
+        .. ":"
+        .. entry.line
+
+    local displayer = entry_display.create({
+        separator = " ",
+        items = {
+            { width = icon_width },
+            { width = agrolens.telescope_opts.display_width },
+        },
+    })
+
+    local display = {}
+    if hl_group then
+        display = { icon, hl_group }
+    end
+
+    local make_display = function()
+        return displayer({
+            display,
+            line,
+        })
+    end
+    return {
+        value = entry,
+        ordinal = line,
+        display = make_display,
+        lnum = entry.lnum,
+        col = entry.col,
+        filename = entry.filename,
+    }
+end
+
 agrolens.generate_new_finder = function(opts)
     return finders.new_table({
         results = agrolens._get_captures(opts),
@@ -373,6 +444,8 @@ end
 agrolens.run = function(opts)
     opts = opts or {}
 
+    agrolens.cur_opts = opts
+
     opts = agrolens._sanitize_opts(opts)
 
     if not agrolens.log then
@@ -380,7 +453,7 @@ agrolens.run = function(opts)
     end
 
     if opts.query then
-        opts.entry_maker = opts.entry_maker or make_entry.gen_from_vimgrep(opts)
+        opts.entry_maker = opts.entry_maker or agrolens.entry_maker
         opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
         opts.previewer = opts.previewer or conf.grep_previewer(opts)
         opts.sorter = opts.sorter or conf.generic_sorter(opts)
