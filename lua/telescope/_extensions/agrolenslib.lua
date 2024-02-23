@@ -388,7 +388,6 @@ agrolens.entry_maker = function(entry)
         icon_width = 2
     end
 
-    print(vim.inspect(agrolens.telescope_opts.force_long_filepath))
     local fname = entry.filename
     if
         agrolens.cur_opts.buffers ~= "all"
