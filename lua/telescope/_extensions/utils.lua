@@ -12,12 +12,16 @@ M.all_trim = function(s)
     return s:match("^%s*(.-)%s*$")
 end
 
+-- Borrowed from telescope.nvim
 M.file_extension = function(filename)
     local parts = vim.split(filename, "%.")
+    -- this check enables us to get multi-part extensions, like *.test.js for example
     if #parts > 2 then
-      return table.concat(vim.list_slice(parts, #parts - 1), ".")
+        return table.concat(vim.list_slice(parts, #parts - 1), ".")
+    else
+        return table.concat(vim.list_slice(parts, #parts), ".")
     end
-    return nil
+
 end
 
 return M
