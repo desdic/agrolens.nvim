@@ -1,25 +1,33 @@
 describe("toml", function()
-
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
 
     it("load", function()
         vim.cmd.edit("tests/toml/test.toml")
         buffers = vim.api.nvim_list_bufs()
-        assert.equal(#buffers, 1)
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries={"labels"}, bufids=buffers})
+        local content  = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "document"), "document")
+
+        core.get_captures({ queries = { "functions" }, bufids = buffers })
     end)
 
     it("labels", function()
-        local entries = lens._get_captures({queries={"labels"}, bufids=buffers})
+        local entries = core.get_captures({ queries = { "labels" }, bufids = buffers })
 
-        assert.equals(#entries, 5)
-        assert.equals("tests/toml/test.toml:5:0:[owner]", entries[1])
-        assert.equals("tests/toml/test.toml:9:0:[database]", entries[2])
-        assert.equals("tests/toml/test.toml:15:0:[servers]", entries[3])
-        assert.equals("tests/toml/test.toml:17:0:[servers.alpha]", entries[4])
-        assert.equals("tests/toml/test.toml:21:0:[servers.beta]", entries[5])
+        eq(#entries, 5)
+        eq(entries[1].filename, "tests/toml/test.toml")
+        eq(entries[1].lnum, 5)
+        eq(entries[1].col, 0)
+
+        eq(entries[1].line, "[owner]")
+        eq(entries[2].line, "[database]")
+        eq(entries[3].line, "[servers]")
+        eq(entries[4].line, "[servers.alpha]")
+        eq(entries[5].line, "[servers.beta]")
     end)
 end)

@@ -25,10 +25,10 @@ jobs:
             manager: sudo apt-get
             packages: -y make lua-check
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: date +%F > todays-date
       - name: Restore from todays cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _neovim
           key: ${{ runner.os }}-${{ matrix.url }}-${{ hashFiles('todays-date') }}
@@ -56,9 +56,9 @@ jobs:
           export VIM="${PWD}/_neovim/share/nvim/runtime"
           nvim --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync lua c cpp rust python go make yaml markdown perl glsl toml php ruby" -c "q"
 
-      # - name: Run tests
-      #   run: |
-      #     export PATH="${PWD}/_neovim/bin:${PATH}"
-      #     export VIM="${PWD}/_neovim/share/nvim/runtime"
-      #     nvim --version
-      #     make test
+      - name: Run tests
+        run: |
+          export PATH="${PWD}/_neovim/bin:${PATH}"
+          export VIM="${PWD}/_neovim/share/nvim/runtime"
+          nvim --version
+          make test

@@ -82,7 +82,7 @@ Usage ~
 Default telescope options:
 >
   agrolens.telescope_opts = {
-      -- Enable/Disable debug messages
+      -- Enable/Disable debug messages (is put in ~/.cache/nvim/agrolens.log)
       debug = false,
 
       -- Some tree-sitter plugins uses hidden buffers

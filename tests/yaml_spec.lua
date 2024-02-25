@@ -1,18 +1,22 @@
 describe("yaml", function()
-    it("docker-compose", function()
-        local lens = nil
-        local buffers = nil
+    local core = require("agrolens.core")
+    local buffers = nil
+    local eq = assert.equals
 
+    it("docker-compose", function()
         vim.cmd.edit("tests/yaml/docker-compose.yml")
         buffers = vim.api.nvim_list_bufs()
 
-        lens = require("telescope._extensions.agrolenslib")
-        local entries = lens._get_captures({queries = {"docker-compose"}, bufids = buffers})
+        local entries = core.get_captures({ queries = { "docker-compose" }, bufids = buffers })
 
-        assert.equals(#entries, 3)
-        assert.equals("tests/yaml/docker-compose.yml:4:2:  fakelookup:", entries[1])
-        assert.equals("tests/yaml/docker-compose.yml:9:2:  shell:", entries[2])
-        assert.equals("tests/yaml/docker-compose.yml:14:2:  test-runner:", entries[3])
+        eq(#entries, 3)
+        eq(entries[1].filename, "tests/yaml/docker-compose.yml")
+        eq(entries[1].lnum, 4)
+        eq(entries[1].col, 2)
+
+        eq(entries[1].line, "  fakelookup:")
+        eq(entries[2].line, "  shell:")
+        eq(entries[3].line, "  test-runner:")
 
         vim.cmd("%bdelete")
     end)
@@ -20,21 +24,25 @@ end)
 
 describe("yaml2", function()
     it("github-workflow-steps", function()
-        local lens = nil
+        local core = require("agrolens.core")
         local buffers = nil
+        local eq = assert.equals
 
         vim.cmd.edit("tests/yaml/github-ci.yml")
         buffers = vim.api.nvim_list_bufs()
 
-        lens = require("telescope._extensions.agrolenslib")
-        local entries = lens._get_captures({queries = {"github-workflow-steps"}, bufids = buffers})
+        local entries = core.get_captures({ queries = { "github-workflow-steps" }, bufids = buffers })
 
-        assert.equals(#entries, 12)
-        assert.equals("tests/yaml/github-ci.yml:29:20:      - name: Checkout", entries[1])
-        assert.equals("tests/yaml/github-ci.yml:30:22:        uses: actions/checkout@v3", entries[2])
-        assert.equals("tests/yaml/github-ci.yml:32:20:      - name: Setup node", entries[3])
-        assert.equals("tests/yaml/github-ci.yml:33:22:        uses: actions/setup-node@v3", entries[4])
-        assert.equals("tests/yaml/github-ci.yml:38:20:      - name: Install", entries[5])
-        assert.equals("tests/yaml/github-ci.yml:39:21:        run: npm ci", entries[6])
+        eq(#entries, 12)
+        eq(entries[1].filename, "tests/yaml/github-ci.yml")
+        eq(entries[1].lnum, 29)
+        eq(entries[1].col, 20)
+
+        eq(entries[1].line, "      - name: Checkout")
+        eq(entries[2].line, "        uses: actions/checkout@v3")
+        eq(entries[3].line, "      - name: Setup node")
+        eq(entries[4].line, "        uses: actions/setup-node@v3")
+        eq(entries[5].line, "      - name: Install")
+        eq(entries[6].line, "        run: npm ci")
     end)
 end)

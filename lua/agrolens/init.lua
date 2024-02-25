@@ -120,9 +120,8 @@ agrolens.create_entry = function(node, level)
 end
 
 agrolens.traverse = function(results, node, cur_node, level)
-    local entry = {}
     if is_same(node, cur_node) then
-        entry = agrolens.create_entry(node, level)
+        local entry = agrolens.create_entry(node, level)
 
         table.insert(results, entry)
 
@@ -131,7 +130,7 @@ agrolens.traverse = function(results, node, cur_node, level)
 
     if node ~= nil then
         if node:named() then
-            entry = agrolens.create_entry(node, level)
+            local entry = agrolens.create_entry(node, level)
             table.insert(results, entry)
 
             for next_node, _ in node:iter_children() do
@@ -238,10 +237,8 @@ agrolens.match_line = function(block, line, captures, capindex)
 end
 
 agrolens.create_content = function(block, node_match, captures, capindex)
-    local content = ""
-
     if block.field_name then
-        content = string.rep(" ", block.level)
+        local content = string.rep(" ", block.level)
             .. block.field_name
             .. ":("
             .. block.node_type
@@ -249,11 +246,10 @@ agrolens.create_content = function(block, node_match, captures, capindex)
         if is_same(block.node, node_match) then
             captures[capindex] = "@agrolens.name"
         end
-    else
-        content = string.rep(" ", block.level) .. "(" .. block.node_type
+        return content
     end
 
-    return content
+    return string.rep(" ", block.level) .. "(" .. block.node_type
 end
 
 --- Generate treesitter query

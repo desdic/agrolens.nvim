@@ -1,59 +1,60 @@
 describe("ruby", function()
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
 
     it("load", function()
         vim.cmd.edit("tests/ruby/test.rb")
         buffers = vim.api.nvim_list_bufs()
-        assert.equal(#buffers, 1)
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries = {"functions"}, bufids = buffers})
+        local content  = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "frozen_string_literal"), "frozen_string_literal")
+
+        core.get_captures({ queries = { "functions" }, bufids = buffers })
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({
-            queries = {"functions"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
-        assert.equals(#entries, 6)
-        assert.equals("tests/ruby/test.rb:7:2:  attr_reader :born, :name",
-                      entries[1])
-        assert.equals("tests/ruby/test.rb:9:2:  def initialize(born, name)",
-                      entries[2])
-        assert.equals("tests/ruby/test.rb:15:0:def wrapped_string(dist)",
-                      entries[3])
-        assert.equals("tests/ruby/test.rb:19:0:def to_string(dist)", entries[4])
-        assert.equals("tests/ruby/test.rb:23:0:def print_intro", entries[5])
-        assert.equals(
-            "tests/ruby/test.rb:30:0:def days_since_birth(born, convf = method(:wrapped_string))",
-            entries[6])
+        eq(#entries, 6)
+        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].lnum, 7)
+        eq(entries[1].col, 2)
+
+        eq(entries[1].line, "  attr_reader :born, :name")
+        eq(entries[2].line, "  def initialize(born, name)")
+        eq(entries[3].line, "def wrapped_string(dist)")
+        eq(entries[4].line, "def to_string(dist)")
+        eq(entries[5].line, "def print_intro")
+        eq(entries[6].line, "def days_since_birth(born, convf = method(:wrapped_string))")
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({
-            queries = {"callings"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
-        assert.equals(#entries, 14)
-        assert.equals("tests/ruby/test.rb:3:0:require 'date'", entries[1])
-        assert.equals("tests/ruby/test.rb:7:2:  attr_reader :born, :name",
-                      entries[2])
-        assert.equals('tests/ruby/test.rb:16:8:  "[#{dist.to_i}]"', entries[3])
+        eq(#entries, 14)
+        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].lnum, 3)
+        eq(entries[1].col, 0)
+
+        eq(entries[1].line, "require 'date'")
+        eq(entries[2].line, "  attr_reader :born, :name")
+        eq(entries[3].line, '  "[#{dist.to_i}]"')
     end)
 
     it("comments", function()
-        local entries = lens._get_captures({
-            queries = {"comments"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
-        assert.equals(#entries, 3)
-        assert.equals("tests/ruby/test.rb:1:0:# frozen_string_literal: true",
-                      entries[1])
-        assert.equals("tests/ruby/test.rb:5:0:# A person", entries[2])
-        assert.equals("tests/ruby/test.rb:27:0:=begin", entries[3])
+        eq(#entries, 3)
+        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].lnum, 1)
+        eq(entries[1].col, 0)
+
+        eq(entries[1].line, "# frozen_string_literal: true")
+        eq(entries[2].line, "# A person")
+        eq(entries[3].line, "=begin")
     end)
 end)

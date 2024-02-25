@@ -4,3 +4,4 @@
 (declaration declarator:(init_declarator value:(call_expression function:(identifier)@agrolens.name))) @agrolens.scope
 (return_statement(call_expression function:(identifier) @agrolens.name)) @agrolens.scope
 (declaration declarator:(init_declarator value:(call_expression function:(parenthesized_expression) @agrolens.name))) @agrolens.scope
+(if_statement condition:(parenthesized_expression (unary_expression argument:(call_expression function:(identifier) @agrolens.name)))) @agrolens.scope
