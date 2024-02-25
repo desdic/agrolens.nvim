@@ -1,52 +1,54 @@
 describe("lua", function()
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
 
     it("load", function()
         vim.cmd.edit("tests/lua/test.lua")
         buffers = vim.api.nvim_list_bufs()
-        assert.equal(#buffers, 1)
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries = {"functions"}, bufids = buffers})
+        local content = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "hello1"), "hello1")
+
+        core.get_captures({ queries = { "functions" }, bufids = buffers })
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({
-            queries = {"functions"},
-            bufids = buffers
-        })
+        local entries =
+            core.get_captures({ queries = { "functions" }, bufids = buffers })
 
-        -- functions
-        assert.equals(#entries, 5)
-        assert.equals("tests/lua/test.lua:1:0:local hello1 = function()",
-                      entries[1])
-        assert.equals("tests/lua/test.lua:5:0:hello2 = function()", entries[2])
-        assert.equals("tests/lua/test.lua:9:0:function hello3()", entries[3])
-        assert.equals("tests/lua/test.lua:19:0:M.hello4 = function()",
-                      entries[4])
-        assert.equals("tests/lua/test.lua:23:0:function M.hello5()", entries[5])
+        eq(#entries, 5)
+        eq(entries[1].lnum, 1)
+        eq(entries[1].col, 0)
+        eq(entries[1].line, "local hello1 = function()")
+        eq(entries[2].line, "hello2 = function()")
+        eq(entries[3].line, "function hello3()")
+        eq(entries[4].line, "M.hello4 = function()")
+        eq(entries[5].line, "function M.hello5()")
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({
-            queries = {"callings"},
-            bufids = buffers
-        })
+        local entries =
+            core.get_captures({ queries = { "callings" }, bufids = buffers })
 
-        assert.equals(#entries, 10)
-        assert.equals('tests/lua/test.lua:2:4:    print("hello1")', entries[1])
-        assert.equals('tests/lua/test.lua:6:4:    print("hello2")', entries[2])
+        eq(#entries, 10)
+        eq(entries[1].lnum, 2)
+        eq(entries[1].col, 4)
+        eq(entries[1].line, '    print("hello1")')
+        eq(entries[2].line, '    print("hello2")')
     end)
 
     it("comments", function()
-        local entries = lens._get_captures({
-            queries = {"comments"},
-            bufids = buffers
-        })
+        local entries =
+            core.get_captures({ queries = { "comments" }, bufids = buffers })
 
-        assert.equals(#entries, 2)
-        assert.equals("tests/lua/test.lua:13:0:-- Local object", entries[1])
-        assert.equals("tests/lua/test.lua:16:0:--[[", entries[2])
+        eq(#entries, 2)
+        eq(entries[1].lnum, 13)
+        eq(entries[1].col, 0)
+        eq(entries[1].line, "-- Local object")
+        eq(entries[2].line, "--[[")
     end)
 end)

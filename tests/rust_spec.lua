@@ -1,74 +1,60 @@
 describe("rust", function()
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
 
     it("load", function()
         vim.cmd.edit("tests/rust/src/main.rs")
         buffers = vim.api.nvim_list_bufs()
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries = {"functions"}, bufids = buffers})
+        local content  = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "DateTime"), "DateTime")
+
+        core.get_captures({ queries = { "functions" }, bufids = buffers })
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({
-            queries = {"functions"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
-        assert.equals(#entries, 4)
-        assert.equals(
-            "tests/rust/src/main.rs:9:4:    fn calc_age_in_days(&self) -> i64 {",
-            entries[1])
-        assert.equals(
-            "tests/rust/src/main.rs:22:4:    fn print(&self, f: fn(&Person) -> String) {",
-            entries[2])
-        assert.equals(
-            "tests/rust/src/main.rs:30:0:fn format_person(p: &Person) -> String {",
-            entries[3])
-        assert.equals("tests/rust/src/main.rs:36:0:fn main() {", entries[4])
+        eq(#entries, 4)
+        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].lnum, 9)
+        eq(entries[1].col, 4)
+
+        eq(entries[1].line, "    fn calc_age_in_days(&self) -> i64 {")
+        eq(entries[2].line, "    fn print(&self, f: fn(&Person) -> String) {")
+        eq(entries[3].line, "fn format_person(p: &Person) -> String {")
+        eq(entries[4].line, "fn main() {")
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({
-            queries = {"callings"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
-        assert.equals(#entries, 7)
-        assert.equals(
-            "tests/rust/src/main.rs:10:8:        let today = Utc::now();",
-            entries[1])
-        assert.equals(
-            'tests/rust/src/main.rs:12:12:            chrono::NaiveDate::parse_from_str(&self.born, "%d-%m-%Y")',
-            entries[2])
-        assert.equals(
-            "tests/rust/src/main.rs:19:8:        today.signed_duration_since(borndate).num_days()",
-            entries[3])
+        eq(#entries, 7)
+        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].lnum, 10)
+        eq(entries[1].col, 8)
 
-        assert.equals(
-            "tests/rust/src/main.rs:31:4:    let age = p.calc_age_in_days();",
-            entries[4])
-        assert.equals(
-            'tests/rust/src/main.rs:39:8:        name: "Donald Duck".to_string(),',
-            entries[5])
-        assert.equals(
-            'tests/rust/src/main.rs:40:8:        born: "07-09-1934".to_string(),',
-            entries[6])
-        assert.equals(
-            "tests/rust/src/main.rs:43:4:    donald.print(format_person);",
-            entries[7])
+        eq(entries[1].line, "        let today = Utc::now();")
+        eq(entries[2].line, '            chrono::NaiveDate::parse_from_str(&self.born, "%d-%m-%Y")')
+        eq(entries[3].line, "        today.signed_duration_since(borndate).num_days()")
+        eq(entries[4].line, "    let age = p.calc_age_in_days();")
+        eq(entries[5].line, '        name: "Donald Duck".to_string(),')
+        eq(entries[6].line, '        born: "07-09-1934".to_string(),')
+        eq(entries[7].line, "    donald.print(format_person);")
     end)
 
     it("comments", function()
-        local entries = lens._get_captures({
-            queries = {"comments"},
-            bufids = buffers
-        })
+        local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
-        assert.equals(#entries, 2)
-        assert.equals("tests/rust/src/main.rs:27:0:/*", entries[1])
-        assert.equals("tests/rust/src/main.rs:37:4:    // Create Donald",
-                      entries[2])
+        eq(#entries, 2)
+        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].lnum, 27)
+        eq(entries[1].col, 0)
+        eq(entries[1].line, "/*")
+        eq(entries[2].line, "    // Create Donald")
     end)
 end)

@@ -1,26 +1,33 @@
 describe("make", function()
-
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
+
 
     it("load", function()
         vim.cmd.edit("tests/make/Makefile")
         buffers = vim.api.nvim_list_bufs()
-        assert.equal(#buffers, 1)
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries={"labels"}, bufids=buffers})
+        local content  = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "all"), "all")
+
+        core.get_captures({ queries = { "labels" }, bufids = buffers })
     end)
 
     it("labels", function()
-        local entries = lens._get_captures({queries={"labels"}, bufids=buffers})
+        local entries = core.get_captures({ queries = { "labels" }, bufids = buffers })
 
-        -- labels
-        assert.equals(#entries, 5)
-        assert.equals("tests/make/Makefile:1:0:.PHONY: all", entries[1])
-        assert.equals("tests/make/Makefile:3:0:all: lint test", entries[2])
-        assert.equals("tests/make/Makefile:5:0:test:", entries[3])
-        assert.equals("tests/make/Makefile:8:0:lint:", entries[4])
-        assert.equals("tests/make/Makefile:11:0:docgen:", entries[5])
+        eq(#entries, 5)
+        eq(entries[1].filename, "tests/make/Makefile")
+        eq(entries[1].lnum, 1)
+        eq(entries[1].col, 0)
+        eq(entries[1].line, ".PHONY: all")
+        eq(entries[2].line, "all: lint test")
+        eq(entries[3].line, "test:")
+        eq(entries[4].line, "lint:")
+        eq(entries[5].line, "docgen:")
     end)
 end)

@@ -1,45 +1,59 @@
 describe("go", function()
-    local lens = nil
+    local core = require("agrolens.core")
     local buffers = nil
+    local eq = assert.equals
 
     it("load", function()
         vim.cmd.edit("tests/go/main.go")
         buffers = vim.api.nvim_list_bufs()
-        assert.equal(#buffers, 1)
+        eq(#buffers, 1)
 
-        lens = require("telescope._extensions.agrolenslib")
-        lens._get_captures({queries = {"functions"}, bufids = buffers})
+        local content  = vim.api.nvim_buf_get_lines(buffers[1], 0, -1, false)
+
+        -- make sure buffer has content
+        eq(string.match(content[1], "package"), "package")
+
+        core.get_captures({ queries = { "functions" }, bufids = buffers })
     end)
 
     it("functions", function()
-        local entries = lens._get_captures({queries = {"functions"}, bufids = buffers})
+        local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
-        assert.equals(#entries, 4)
+        eq(#entries, 4)
+        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].lnum, 15)
+        eq(entries[1].col, 0)
 
-        assert.equals("tests/go/main.go:15:0:func (p *Person) GetName() string {", entries[1])
-        assert.equals("tests/go/main.go:19:0:func print_person(p Person, fn format_func) {", entries[2])
-        assert.equals("tests/go/main.go:23:0:func main() {", entries[3])
-        assert.equals("tests/go/main.go:29:1:\tformat_func := func(p Person) string {", entries[4])
+        eq(entries[1].line, "func (p *Person) GetName() string {")
+        eq(entries[2].line, "func print_person(p Person, fn format_func) {")
+        eq(entries[3].line, "func main() {")
+        eq(entries[4].line, "\tformat_func := func(p Person) string {")
     end)
 
     it("callings", function()
-        local entries = lens._get_captures({queries = {"callings"}, bufids = buffers})
+        local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
-        assert.equals(#entries, 10)
+        eq(#entries, 10)
+        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].lnum, 20)
+        eq(entries[1].col, 2)
 
-        assert.equals("tests/go/main.go:20:2:\tfmt.Println(fn(p))", entries[1])
-        assert.equals("tests/go/main.go:20:1:\tfmt.Println(fn(p))", entries[2])
-        assert.equals('tests/go/main.go:30:15:\t\ttt, err := time.Parse("01-02-2006", p.Born)', entries[3])
-        assert.equals("tests/go/main.go:32:13:\t\t\treturn err.Error()", entries[4])
-        assert.equals("tests/go/main.go:35:19:\t\tcurrentTime := time.Now()", entries[5])
+        eq(entries[1].line, "\tfmt.Println(fn(p))")
+        eq(entries[2].line, "\tfmt.Println(fn(p))")
+        eq(entries[3].line, '\t\ttt, err := time.Parse("01-02-2006", p.Born)')
+        eq(entries[4].line, "\t\t\treturn err.Error()")
+        eq(entries[5].line, "\t\tcurrentTime := time.Now()")
     end)
 
     it("comments", function()
-        local entries = lens._get_captures({queries = {"comments"}, bufids = buffers})
+        local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
-        assert.equals(#entries, 2)
+        eq(#entries, 2)
+        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].lnum, 26)
+        eq(entries[1].col, 1)
 
-        assert.equals("tests/go/main.go:26:1:\t/*", entries[1])
-        assert.equals("tests/go/main.go:41:1:\t// Print Donald", entries[2])
+        eq(entries[1].line, "\t/*")
+        eq(entries[2].line, "\t// Print Donald")
     end)
 end)
