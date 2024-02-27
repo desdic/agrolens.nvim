@@ -24,8 +24,13 @@ function M.hello5()
     print("hello5")
 end
 
+function M:hello6()
+    print("hello6")
+end
+
 hello1()
 hello2()
 hello3()
 M.hello4()
 M.hello5()
+M:hello6()
