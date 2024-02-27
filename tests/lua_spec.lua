@@ -20,7 +20,7 @@ describe("lua", function()
         local entries =
             core.get_captures({ queries = { "functions" }, bufids = buffers })
 
-        eq(#entries, 5)
+        eq(#entries, 6)
         eq(entries[1].lnum, 1)
         eq(entries[1].col, 0)
         eq(entries[1].line, "local hello1 = function()")
@@ -28,17 +28,19 @@ describe("lua", function()
         eq(entries[3].line, "function hello3()")
         eq(entries[4].line, "M.hello4 = function()")
         eq(entries[5].line, "function M.hello5()")
+        eq(entries[6].line, "function M:hello6()")
     end)
 
     it("callings", function()
         local entries =
             core.get_captures({ queries = { "callings" }, bufids = buffers })
 
-        eq(#entries, 10)
+        eq(#entries, 12)
         eq(entries[1].lnum, 2)
         eq(entries[1].col, 4)
         eq(entries[1].line, '    print("hello1")')
         eq(entries[2].line, '    print("hello2")')
+        eq(entries[12].line, 'M:hello6()')
     end)
 
     it("comments", function()

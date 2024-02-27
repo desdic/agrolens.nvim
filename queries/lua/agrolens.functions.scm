@@ -15,3 +15,9 @@
     (variable_list name:(dot_index_expression field:(identifier) @agrolens.name))
     (expression_list value:(function_definition))
 ) @agrolens.scope
+
+(function_declaration
+ name:(method_index_expression
+  table:(identifier)
+  method:(identifier) @agrolens.name)) @agrolens.scope
+
