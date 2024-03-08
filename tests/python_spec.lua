@@ -21,7 +21,7 @@ describe("python", function()
             core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 4)
-        eq(entries[1].filename, "tests/python/test.py")
+        eq(entries[1].relfilename, "tests/python/test.py")
         eq(entries[1].lnum, 11)
         eq(entries[1].col, 4)
 

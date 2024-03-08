@@ -22,7 +22,7 @@ describe("c", function()
 
         eq(#entries, 5)
 
-        eq(entries[1].filename, "tests/c/test.c")
+        eq(entries[1].relfilename, "tests/c/test.c")
         eq(entries[1].lnum, 16)
         eq(entries[1].col, 0)
         eq(entries[1].line, "int days_since_birth(struct Person *p) {")
@@ -39,7 +39,7 @@ describe("c", function()
             core.get_captures({ queries = { "callings" }, bufids = buffers })
         eq(#entries, 10)
 
-        eq(entries[1].filename, "tests/c/test.c")
+        eq(entries[1].relfilename, "tests/c/test.c")
         eq(entries[1].lnum, 23)
         eq(entries[1].col, 2)
 
@@ -65,7 +65,7 @@ describe("c", function()
             core.get_captures({ queries = { "comments" }, bufids = buffers })
         eq(#entries, 4)
 
-        eq(entries[1].filename, "tests/c/test.c")
+        eq(entries[1].relfilename, "tests/c/test.c")
         eq(entries[1].lnum, 52)
         eq(entries[1].col, 0)
 

@@ -20,7 +20,7 @@ describe("rust", function()
         local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 4)
-        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].relfilename, "tests/rust/src/main.rs")
         eq(entries[1].lnum, 9)
         eq(entries[1].col, 4)
 
@@ -34,7 +34,7 @@ describe("rust", function()
         local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
         eq(#entries, 7)
-        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].relfilename, "tests/rust/src/main.rs")
         eq(entries[1].lnum, 10)
         eq(entries[1].col, 8)
 
@@ -51,7 +51,7 @@ describe("rust", function()
         local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
         eq(#entries, 2)
-        eq(entries[1].filename, "tests/rust/src/main.rs")
+        eq(entries[1].relfilename, "tests/rust/src/main.rs")
         eq(entries[1].lnum, 27)
         eq(entries[1].col, 0)
         eq(entries[1].line, "/*")

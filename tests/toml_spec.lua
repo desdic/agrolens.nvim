@@ -20,7 +20,7 @@ describe("toml", function()
         local entries = core.get_captures({ queries = { "labels" }, bufids = buffers })
 
         eq(#entries, 5)
-        eq(entries[1].filename, "tests/toml/test.toml")
+        eq(entries[1].relfilename, "tests/toml/test.toml")
         eq(entries[1].lnum, 5)
         eq(entries[1].col, 0)
 
