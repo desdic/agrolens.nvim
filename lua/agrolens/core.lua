@@ -3,7 +3,14 @@ local M = {}
 local utils = require("telescope._extensions.utils")
 local ppath = require("plenary.path")
 
-M.create_entry = function(filename, relfilename, matches, iter_query, bufnr, capture_name)
+M.create_entry = function(
+    filename,
+    relfilename,
+    matches,
+    iter_query,
+    bufnr,
+    capture_name
+)
     local entry = {}
     entry.filename = filename
     entry.relfilename = relfilename
