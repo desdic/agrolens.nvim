@@ -97,12 +97,14 @@ agrolens.entry_maker = function(entry)
         icon_width = 2
     end
 
-    local fname = entry.filename
+    local fname = entry.relfilename
     if
         agrolens.cur_opts.buffers ~= "all"
         and agrolens.telescope_opts.force_long_filepath ~= true
     then
-        fname = vim.fs.basename(fname)
+        fname = vim.fs.basename(entry.filename)
+        -- else
+        --     fname = ppath:new(fname):make_relative(agrolens.cur_opts.cwd)
     end
 
     local line = fname

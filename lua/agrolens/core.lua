@@ -1,11 +1,19 @@
 local M = {}
 
-local ppath = require("plenary.path")
 local utils = require("telescope._extensions.utils")
+local ppath = require("plenary.path")
 
-M.create_entry = function(filename, matches, iter_query, bufnr, capture_name)
+M.create_entry = function(
+    filename,
+    relfilename,
+    matches,
+    iter_query,
+    bufnr,
+    capture_name
+)
     local entry = {}
     entry.filename = filename
+    entry.relfilename = relfilename
     entry.bufnr = bufnr
 
     for i, _ in pairs(matches) do
@@ -60,6 +68,7 @@ M.add_entries = function(
     capture_names,
     bufnr,
     filename,
+    relfilename,
     filetype
 )
     local ts = vim.treesitter
@@ -76,6 +85,7 @@ M.add_entries = function(
                 for _, matches, _ in iter_query:iter_matches(root, bufnr) do
                     local entry = M.create_entry(
                         filename,
+                        relfilename,
                         matches,
                         iter_query,
                         bufnr,
@@ -105,7 +115,7 @@ M.get_captures = function(opts)
 
     for _, bufnr in ipairs(opts.bufids) do
         local buffilename = vim.api.nvim_buf_get_name(bufnr)
-        local relpath = ppath:new(buffilename):make_relative(opts.cwd)
+        local relfilename = ppath:new(buffilename):make_relative(opts.cwd)
         local filetype = vim.filetype.match({ buf = bufnr })
 
         if filetype and filetype ~= "" then
@@ -114,7 +124,8 @@ M.get_captures = function(opts)
                 entries,
                 opts.queries,
                 bufnr,
-                relpath,
+                buffilename,
+                relfilename,
                 filetype
             )
         end

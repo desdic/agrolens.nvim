@@ -20,7 +20,7 @@ describe("php", function()
         local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 3)
-        eq(entries[1].filename, "tests/php/test.php")
+        eq(entries[1].relfilename, "tests/php/test.php")
         eq(entries[1].lnum, 6)
         eq(entries[1].col, 2)
 
@@ -33,7 +33,7 @@ describe("php", function()
         local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
         eq(#entries, 5)
-        eq(entries[1].filename, "tests/php/test.php")
+        eq(entries[1].relfilename, "tests/php/test.php")
         eq(entries[1].lnum, 21)
         eq(entries[1].col, 0)
 
@@ -45,7 +45,7 @@ describe("php", function()
         local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
         eq(#entries, 2)
-        eq(entries[1].filename, "tests/php/test.php")
+        eq(entries[1].relfilename, "tests/php/test.php")
         eq(entries[1].lnum, 3)
         eq(entries[1].col, 0)
 

@@ -20,7 +20,7 @@ describe("ruby", function()
         local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 6)
-        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].relfilename, "tests/ruby/test.rb")
         eq(entries[1].lnum, 7)
         eq(entries[1].col, 2)
 
@@ -36,7 +36,7 @@ describe("ruby", function()
         local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
         eq(#entries, 14)
-        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].relfilename, "tests/ruby/test.rb")
         eq(entries[1].lnum, 3)
         eq(entries[1].col, 0)
 
@@ -49,7 +49,7 @@ describe("ruby", function()
         local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
         eq(#entries, 3)
-        eq(entries[1].filename, "tests/ruby/test.rb")
+        eq(entries[1].relfilename, "tests/ruby/test.rb")
         eq(entries[1].lnum, 1)
         eq(entries[1].col, 0)
 

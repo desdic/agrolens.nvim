@@ -10,7 +10,7 @@ describe("yaml", function()
         local entries = core.get_captures({ queries = { "docker-compose" }, bufids = buffers })
 
         eq(#entries, 3)
-        eq(entries[1].filename, "tests/yaml/docker-compose.yml")
+        eq(entries[1].relfilename, "tests/yaml/docker-compose.yml")
         eq(entries[1].lnum, 4)
         eq(entries[1].col, 2)
 
@@ -34,7 +34,7 @@ describe("yaml2", function()
         local entries = core.get_captures({ queries = { "github-workflow-steps" }, bufids = buffers })
 
         eq(#entries, 12)
-        eq(entries[1].filename, "tests/yaml/github-ci.yml")
+        eq(entries[1].relfilename, "tests/yaml/github-ci.yml")
         eq(entries[1].lnum, 29)
         eq(entries[1].col, 20)
 

@@ -20,7 +20,7 @@ describe("markdown", function()
         local entries = core.get_captures({ queries = { "labels" }, bufids = buffers })
 
         eq(#entries, 4)
-        eq(entries[1].filename, "tests/markdown/note.md")
+        eq(entries[1].relfilename, "tests/markdown/note.md")
         eq(entries[1].lnum, 1)
         eq(entries[1].col, 0)
         eq(entries[1].line, "# Heading#1")

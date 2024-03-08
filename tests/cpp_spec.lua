@@ -21,7 +21,7 @@ describe("cpp", function()
             core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 4)
-        eq(entries[1].filename, "tests/cpp/main.cc")
+        eq(entries[1].relfilename, "tests/cpp/main.cc")
         eq(entries[1].lnum, 18)
         eq(entries[1].col, 0)
 
@@ -42,7 +42,7 @@ describe("cpp", function()
             core.get_captures({ queries = { "callings" }, bufids = buffers })
 
         eq(#entries, 5)
-        eq(entries[1].filename, "tests/cpp/main.cc")
+        eq(entries[1].relfilename, "tests/cpp/main.cc")
         eq(entries[1].lnum, 36)
         eq(entries[1].col, 4)
 
@@ -58,7 +58,7 @@ describe("cpp", function()
             core.get_captures({ queries = { "comments" }, bufids = buffers })
 
         eq(#entries, 3)
-        eq(entries[1].filename, "tests/cpp/main.cc")
+        eq(entries[1].relfilename, "tests/cpp/main.cc")
         eq(entries[1].lnum, 23)
         eq(entries[1].col, 0)
         eq(entries[1].line, '/* basic seconds to days')

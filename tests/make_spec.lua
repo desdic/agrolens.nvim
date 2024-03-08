@@ -21,7 +21,7 @@ describe("make", function()
         local entries = core.get_captures({ queries = { "labels" }, bufids = buffers })
 
         eq(#entries, 5)
-        eq(entries[1].filename, "tests/make/Makefile")
+        eq(entries[1].relfilename, "tests/make/Makefile")
         eq(entries[1].lnum, 1)
         eq(entries[1].col, 0)
         eq(entries[1].line, ".PHONY: all")

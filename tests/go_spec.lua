@@ -20,7 +20,7 @@ describe("go", function()
         local entries = core.get_captures({ queries = { "functions" }, bufids = buffers })
 
         eq(#entries, 4)
-        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].relfilename, "tests/go/main.go")
         eq(entries[1].lnum, 15)
         eq(entries[1].col, 0)
 
@@ -34,7 +34,7 @@ describe("go", function()
         local entries = core.get_captures({ queries = { "callings" }, bufids = buffers })
 
         eq(#entries, 10)
-        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].relfilename, "tests/go/main.go")
         eq(entries[1].lnum, 20)
         eq(entries[1].col, 2)
 
@@ -49,7 +49,7 @@ describe("go", function()
         local entries = core.get_captures({ queries = { "comments" }, bufids = buffers })
 
         eq(#entries, 2)
-        eq(entries[1].filename, "tests/go/main.go")
+        eq(entries[1].relfilename, "tests/go/main.go")
         eq(entries[1].lnum, 26)
         eq(entries[1].col, 1)
 
