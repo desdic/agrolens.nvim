@@ -1,6 +1,5 @@
 local M = {}
 
-local ppath = require("plenary.path")
 local utils = require("telescope._extensions.utils")
 
 M.create_entry = function(filename, matches, iter_query, bufnr, capture_name)
@@ -105,7 +104,6 @@ M.get_captures = function(opts)
 
     for _, bufnr in ipairs(opts.bufids) do
         local buffilename = vim.api.nvim_buf_get_name(bufnr)
-        local relpath = ppath:new(buffilename):make_relative(opts.cwd)
         local filetype = vim.filetype.match({ buf = bufnr })
 
         if filetype and filetype ~= "" then
@@ -114,7 +112,7 @@ M.get_captures = function(opts)
                 entries,
                 opts.queries,
                 bufnr,
-                relpath,
+                buffilename,
                 filetype
             )
         end
