@@ -5,7 +5,6 @@ local conf = require("telescope.config").values
 local utils = require("telescope._extensions.utils")
 local core = require("agrolens.core")
 local entry_display = require("telescope.pickers.entry_display")
-local ppath = require("plenary.path")
 
 local agrolens = {}
 
@@ -98,14 +97,14 @@ agrolens.entry_maker = function(entry)
         icon_width = 2
     end
 
-    local fname = entry.filename
+    local fname = entry.relfilename
     if
         agrolens.cur_opts.buffers ~= "all"
         and agrolens.telescope_opts.force_long_filepath ~= true
     then
-        fname = vim.fs.basename(fname)
-    else
-        fname = ppath:new(fname):make_relative(agrolens.cur_opts.cwd)
+        fname = vim.fs.basename(entry.filename)
+    -- else
+    --     fname = ppath:new(fname):make_relative(agrolens.cur_opts.cwd)
     end
 
     local line = fname
