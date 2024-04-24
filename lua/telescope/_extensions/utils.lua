@@ -1,5 +1,7 @@
 local M = {}
 
+local len = vim.len or vim.tbl_count
+
 M.ltrim = function(s)
     return s:gsub("^%s*", "")
 end
@@ -33,7 +35,7 @@ M.split = function(source, delimiters)
     local pattern = "([^" .. delimiters .. "]+)"
     --- Keep linter happy
     local _ = string.gsub(source, pattern, function(value)
-        elements[vim.tbl_count(elements) + 1] = value
+        elements[len(elements) + 1] = value
     end)
     return elements
 end

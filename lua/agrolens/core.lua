@@ -2,6 +2,8 @@ local M = {}
 
 local utils = require("telescope._extensions.utils")
 local ppath = require("plenary.path")
+local empty = vim.empty or vim.tbl_isempty
+local len = vim.len or vim.tbl_count
 
 M.create_entry = function(
     filename,
@@ -193,7 +195,7 @@ M.sanitize_opts = function(opts, telescope_opts, telescope_config)
         for match in opts.match:gmatch("[^,%s]+") do
             local elements = utils.split(match, "=")
 
-            if vim.tbl_count(elements) == 1 then
+            if len(elements) == 1 then
                 table.insert(elements, current_word)
             end
 
@@ -207,7 +209,7 @@ M.sanitize_opts = function(opts, telescope_opts, telescope_config)
 
     opts.disable_indentation = telescope_config.disable_indentation or false
 
-    if not vim.tbl_isempty(matches) then
+    if not empty(matches) then
         opts.matches = matches
     end
 

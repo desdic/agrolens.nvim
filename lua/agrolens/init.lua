@@ -62,6 +62,8 @@ agrolens.opts = {
 
 local ts_utils = require("nvim-treesitter.ts_utils")
 local agroutils = require("telescope._extensions.utils")
+local empty = vim.empty or vim.tbl_isempty
+local len = vim.len or vim.tbl_count
 
 local get_field_name = function(node)
     local parent = node:parent()
@@ -201,7 +203,7 @@ end
 
 agrolens.end_closures = function(list, captures, count, captureid)
     if count > 0 then
-        local index = vim.tbl_count(list)
+        local index = len(list)
         for x = 1, count do
             list[index] = list[index] .. ")"
             if captures[x] then
@@ -281,7 +283,7 @@ agrolens.generate = function(opts)
     local list = {}
     local captures = {}
     local count = 0
-    local numnodes = vim.tbl_count(tree)
+    local numnodes = len(tree)
     local captureid = 1
 
     for i, block in ipairs(tree) do
@@ -313,7 +315,7 @@ agrolens.generate = function(opts)
 
     agrolens.end_closures(list, captures, count, captureid)
 
-    if not vim.tbl_isempty(list) then
+    if not empty(list) then
         if opts.in_register then
             vim.fn.setreg(opts.register, list, "l")
         end
