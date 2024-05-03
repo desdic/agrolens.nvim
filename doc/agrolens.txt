@@ -111,7 +111,7 @@ Default telescope options:
       -- entry_maker = agrolens.entry_maker
       --
       -- Default way of finding current directory
-      -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+      -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd() or vim.uv.cwd()
       --
       -- Default previewer
       -- previewer = conf.grep_previewer(opts)
