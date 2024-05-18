@@ -40,7 +40,7 @@ agrolens.telescope_opts = {
     -- entry_maker = agrolens.entry_maker
     --
     -- Default way of finding current directory
-    -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd() or vim.uv.cwd()
+    -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
     --
     -- Default previewer
     -- previewer = conf.grep_previewer(opts)
@@ -170,9 +170,7 @@ agrolens.run = function(opts)
 
     if opts.query then
         opts.entry_maker = opts.entry_maker or agrolens.entry_maker
-        opts.cwd = opts.cwd and vim.fn.expand(opts.cwd)
-            or vim.loop.cwd()
-            or vim.uv.cwd()
+        opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
         opts.previewer = opts.previewer or conf.grep_previewer(opts)
         opts.sorter = opts.sorter or conf.generic_sorter(opts)
         opts = utils.get_buffers(opts)

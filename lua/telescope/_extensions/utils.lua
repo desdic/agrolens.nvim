@@ -1,6 +1,6 @@
 local M = {}
 
-local len = vim.len or vim.tbl_count
+local len = vim.tbl_count
 
 M.ltrim = function(s)
     return s:gsub("^%s*", "")
