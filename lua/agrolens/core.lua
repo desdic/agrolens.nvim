@@ -2,8 +2,8 @@ local M = {}
 
 local utils = require("telescope._extensions.utils")
 local ppath = require("plenary.path")
-local empty = vim.empty or vim.tbl_isempty
-local len = vim.len or vim.tbl_count
+local empty = vim.tbl_isempty
+local len = vim.tbl_count
 
 M.create_entry = function(
     filename,

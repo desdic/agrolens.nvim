@@ -12,16 +12,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-24.04
             url: https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
-          - os: ubuntu-20.04
-            url: https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz
-            manager: sudo apt-get
-            packages: -y make lua-check
-          - os: ubuntu-20.04
-            url: https://github.com/neovim/neovim/releases/download/v0.9.4/nvim-linux64.tar.gz
+          - os: ubuntu-24.04
+            url: https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
     steps:

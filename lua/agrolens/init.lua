@@ -62,8 +62,8 @@ agrolens.opts = {
 
 local ts_utils = require("nvim-treesitter.ts_utils")
 local agroutils = require("telescope._extensions.utils")
-local empty = vim.empty or vim.tbl_isempty
-local len = vim.len or vim.tbl_count
+local empty = vim.tbl_isempty
+local len = vim.tbl_count
 
 local get_field_name = function(node)
     local parent = node:parent()
