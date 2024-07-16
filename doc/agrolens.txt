@@ -39,7 +39,7 @@ a given cursor postion.
                                                                  *agrolens.opts*
                                 `agrolens.opts`
 Default options when generation a query:
->
+>lua
   agrolens.opts = {
       -- Register to copy to
       register = "",
@@ -62,7 +62,6 @@ Default options when generation a query:
       include_root_node = false,
   }
 <
-
 ------------------------------------------------------------------------------
                                                            *agrolens.generate()*
                           `agrolens.generate`({opts})
@@ -80,7 +79,7 @@ Usage ~
                                                        *agrolens.telescope_opts*
                            `agrolens.telescope_opts`
 Default telescope options:
->
+>lua
   agrolens.telescope_opts = {
       -- Enable/Disable debug messages (is put in ~/.cache/nvim/agrolens.log)
       debug = false,
@@ -129,6 +128,5 @@ Default telescope options:
       force_long_filepath = false,
   }
 <
-
 
  vim:tw=78:ts=8:noet:ft=help:norl:
