@@ -16,7 +16,7 @@
 ---             end,
 ---         },
 ---     },
---- },`
+--- },
 ---
 --- Enabling telescope extension (and default options)
 --- Options can be overwritten when calling the extension
