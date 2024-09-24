@@ -84,25 +84,29 @@ M.add_entries = function(
             local iter_query =
                 vim.treesitter.query.get(filetype, "agrolens." .. capture_name)
             if iter_query then
-                for _, matches, _ in iter_query:iter_matches(root, bufnr) do
-                    local entry = M.create_entry(
-                        filename,
-                        relfilename,
-                        matches,
-                        iter_query,
-                        bufnr,
-                        capture_name
-                    )
+                for _, matches, _ in
+                    iter_query:iter_matches(root, bufnr, 0, -1, { all = false })
+                do
+                    if matches ~= nil then
+                        local entry = M.create_entry(
+                            filename,
+                            relfilename,
+                            matches,
+                            iter_query,
+                            bufnr,
+                            capture_name
+                        )
 
-                    if opts.disable_indentation then
-                        entry.line = utils.all_trim(entry.line)
-                    end
+                        if opts.disable_indentation then
+                            entry.line = utils.all_trim(entry.line)
+                        end
 
-                    local formated_entry = utils.format_entry(entry)
-                    if not dublicates[formated_entry] then
-                        dublicates[formated_entry] = true
-                        if M.does_match(opts, entry) then
-                            table.insert(entries, entry)
+                        local formated_entry = utils.format_entry(entry)
+                        if not dublicates[formated_entry] then
+                            dublicates[formated_entry] = true
+                            if M.does_match(opts, entry) then
+                                table.insert(entries, entry)
+                            end
                         end
                     end
                 end
