@@ -2,84 +2,13 @@ local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local actions = require("telescope.actions")
 local conf = require("telescope.config").values
-local utils = require("telescope._extensions.utils")
+local utils = require("agrolens.utils")
 local core = require("agrolens.core")
 local entry_display = require("telescope.pickers.entry_display")
 
 local agrolens = {}
 
---- Default telescope options:
----@eval return MiniDoc.afterlines_to_code(MiniDoc.current.eval_section)
-agrolens.telescope_opts = {
-    -- Enable/Disable debug messages (is put in ~/.cache/nvim/agrolens.log)
-    debug = false,
-
-    -- Some tree-sitter plugins uses hidden buffers
-    -- and we can enable those to if we want
-    include_hidden_buffers = false,
-
-    -- Make sure the query only runs on
-    -- same filetype as the current one
-    same_type = true,
-
-    -- Match a given string or object
-    -- Example `:Telescope agrolens query=callings buffers=all same_type=false match=name,object`
-    -- this will query all callings but only those who match the word on the cursor
-    match = nil,
-
-    -- Disable displaying indententations in telescope
-    disable_indentation = false,
-
-    -- Alias can be used to join several queries into a single name
-    -- Example: `aliases = { yamllist = "docker-compose,github-workflow-steps"}`
-    aliases = {},
-
-    -- Several internal functions can also be overwritten
-    --
-    -- Default entry maker
-    -- entry_maker = agrolens.entry_maker
-    --
-    -- Default way of finding current directory
-    -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
-    --
-    -- Default previewer
-    -- previewer = conf.grep_previewer(opts)
-    --
-    -- Default sorting
-    -- sorter = conf.generic_sorter(opts)
-
-    -- Default enable devicons
-    disable_devicons = false,
-
-    -- display length
-    display_width = 150,
-
-    -- force long path name even when only a single buffer
-    force_long_filepath = false,
-}
---minidoc_afterlines_end
-
-agrolens.jump_next = function(curline, jumplist)
-    table.sort(jumplist)
-    for _, line in pairs(jumplist) do
-        if line > curline then
-            vim.api.nvim_win_set_cursor(0, { line, 0 })
-            break
-        end
-    end
-end
-
-agrolens.jump_prev = function(curline, jumplist)
-    table.sort(jumplist, function(a, b)
-        return a > b
-    end)
-    for _, line in pairs(jumplist) do
-        if line < curline then
-            vim.api.nvim_win_set_cursor(0, { line, 0 })
-            break
-        end
-    end
-end
+agrolens.telescope_opts = require("agrolens.config").opts
 
 agrolens.entry_maker = function(entry)
     local basename = vim.fs.basename(entry.filename)
@@ -103,8 +32,6 @@ agrolens.entry_maker = function(entry)
         and agrolens.telescope_opts.force_long_filepath ~= true
     then
         fname = vim.fs.basename(entry.filename)
-        -- else
-        --     fname = ppath:new(fname):make_relative(agrolens.cur_opts.cwd)
     end
 
     local line = fname
@@ -173,16 +100,16 @@ agrolens.run = function(opts)
         opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
         opts.previewer = opts.previewer or conf.grep_previewer(opts)
         opts.sorter = opts.sorter or conf.generic_sorter(opts)
-        opts = utils.get_buffers(opts)
+        opts = core.get_buffers(opts)
 
         if opts.jump then
             local jumplist = core.generate_jump_list(opts)
             local curline = vim.api.nvim_win_get_cursor(0)[1]
 
             if opts.jump == "next" then
-                agrolens.jump_next(curline, jumplist)
+                core.jump_next(curline, jumplist)
             elseif opts.jump == "prev" then
-                agrolens.jump_prev(curline, jumplist)
+                core.jump_prev(curline, jumplist)
             end
         else
             pickers
