@@ -61,7 +61,7 @@ agrolens.opts = {
 --minidoc_afterlines_end
 
 local ts_utils = require("nvim-treesitter.ts_utils")
-local agroutils = require("telescope._extensions.utils")
+local utils = require("agrolens.utils")
 local empty = vim.tbl_isempty
 local len = vim.tbl_count
 
@@ -229,7 +229,7 @@ end
 
 agrolens.match_line = function(block, line, captures, capindex)
     local pattern = "^%s*"
-        .. escape_pattern(agroutils.ltrim(block.node_text))
+        .. escape_pattern(utils.ltrim(block.node_text))
         .. "$"
     local matches = string.match(line, pattern)
 
@@ -324,6 +324,16 @@ agrolens.generate = function(opts)
             local bufnr = vim.api.nvim_create_buf(true, true)
             vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, list)
             vim.api.nvim_win_set_buf(vim.api.nvim_get_current_win(), bufnr)
+        end
+    end
+end
+
+agrolens.setup = function(options)
+    agrolens.config = require("agrolens.config").opts
+
+    if options ~= nil then
+        for k, v in pairs(options) do
+            agrolens.config[k] = v
         end
     end
 end

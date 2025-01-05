@@ -13,19 +13,113 @@ Its an extention to telescope that runs pre-defined (or custom) tree-sitter quer
 
 [Neovim 0.10+](https://github.com/neovim/neovim)
 
+[Nvim tree-sitter](https://github.com/nvim-treesitter/nvim-treesitter)
+
+Language specific tree-sitter support is also needed (Depends on your needs)
+
+Support for telescope requires:
+
 [Telescope](https://github.com/nvim-telescope/telescope.nvim)
 
 [Plenary](https://github.com/nvim-lua/plenary.nvim)
 
-[Nvim tree-sitter](https://github.com/nvim-treesitter/nvim-treesitter)
+Support for fzf requires:
 
-And the language you with to use is also required to be installed via Nvim tree-sitter
+[Fzf-lua](https://github.com/ibhagwan/fzf-lua)
 
-# Installation
 
-Install 
+# Default options
 
-Use your favorite plugin manager
+Options are the same for fzf and telescope they are just added in different places
+
+```lua
+{
+    -- Enable/Disable debug messages (is put in ~/.cache/nvim/agrolens.log)
+    debug = false,
+
+    -- Some tree-sitter plugins uses hidden buffers
+    -- and we can enable those to if we want
+    include_hidden_buffers = false,
+
+    -- Make sure the query only runs on
+    -- same filetype as the current one
+    same_type = true,
+
+    -- Match a given string or object
+    -- Example `:Telescope agrolens query=callings buffers=all same_type=false match=name,object`
+    -- this will query all callings but only those who match the word on the cursor
+    match = nil,
+
+    -- Disable displaying indententations in telescope
+    disable_indentation = false,
+
+    -- Alias can be used to join several queries into a single name
+    -- Example: `aliases = { yamllist = "docker-compose,github-workflow-steps"}`
+    aliases = {},
+
+    -- Several internal functions can also be overwritten
+    --
+    -- Default entry maker (telescope only)
+    -- entry_maker = agrolens.entry_maker
+    --
+    -- Default way of finding current directory
+    -- cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
+    --
+    -- Default previewer (telescope only)
+    -- previewer = conf.grep_previewer(opts)
+    --
+    -- Default sorting (telescope only)
+    -- sorter = conf.generic_sorter(opts)
+
+    -- Default enable devicons
+    disable_devicons = false,
+
+    -- display length
+    display_width = 150,
+
+    -- force long path name even when only a single buffer
+    force_long_filepath = false,
+}
+```
+
+# Setup
+
+<details><summary>Fzf</summary>
+
+```lua
+{
+    "desdic/agrolens.nvim",
+    opts = {
+        force_long_filepath = true,
+        debug = false,
+        same_type = false,
+        include_hidden_buffers = false,
+        disable_indentation = true,
+        aliases = {
+            yamllist = "docker-compose,github-workflow-steps",
+            work = "cheflxchost,github-workflow-steps,pytest,ipam",
+            all = "cheflxchost,pytest,ipam,functions,labels",
+        },
+    },
+    keys = {
+        {
+            "zu",
+            function()
+                require("agrolens.fzf").run({
+                    query = "functions,labels",
+                    buffers = "all",
+                    same_type = false,
+                })
+            end,
+            desc = "find functions and labels",
+        },
+    },
+}
+```
+
+</details>
+
+<details><summary>Telescope</summary>
 
 ```lua
 "desdic/agrolens.nvim"
@@ -50,8 +144,10 @@ require("telescope").extensions = {
     }
 }
 ```
+</details>
 
-# Usage
+
+# Usage via Telescope
 
 ```
 :Telescope agrolens <parameters>
@@ -115,7 +211,6 @@ Jump to next match in query `work`
 Using aliases its possible to create a new query name where its a list of other queries like
 
 ```
-agrolens = {
 ...
     aliases = {
         yamllist = "docker-compose,github-workflow-steps",

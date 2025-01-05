@@ -1,5 +1,5 @@
 describe("utils", function()
-    local utils = require("telescope._extensions.utils")
+    local utils = require("agrolens.utils")
 
     local eq = assert.equals
 
@@ -15,7 +15,10 @@ describe("utils", function()
 
     it("file_extention", function()
         eq(utils.file_extension(vim.fs.basename("/home/myuser/test.go")), "go")
-        eq(utils.file_extension(vim.fs.basename("/home/myuser/test.test.js")), "test.js")
+        eq(
+            utils.file_extension(vim.fs.basename("/home/myuser/test.test.js")),
+            "test.js"
+        )
     end)
 
     it("matchstr", function()
@@ -29,5 +32,4 @@ describe("utils", function()
         eq(elems[2], "test2")
         eq(elems[3], " test3")
     end)
-
 end)

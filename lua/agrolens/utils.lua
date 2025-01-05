@@ -68,41 +68,4 @@ M.hash_keys_to_list = function(entries)
     return list
 end
 
-M.make_bufferlist = function(opts)
-    local buffers = {}
-
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if
-            opts.same_type == false
-            or vim.filetype.match({ buf = bufnr }) == opts.cur_type
-        then
-            if opts.include_hidden_buffers == false then
-                if vim.fn.getbufinfo(bufnr)[1].listed == 1 then
-                    table.insert(buffers, bufnr)
-                end
-            else
-                table.insert(buffers, bufnr)
-            end
-        end
-    end
-    return buffers
-end
-
-M.get_buffers = function(opts)
-    local curbuf = vim.api.nvim_get_current_buf()
-
-    opts.cur_type = vim.filetype.match({ buf = curbuf })
-
-    local bufids = { curbuf }
-    if opts.buffers and type(opts.buffers) == "string" then
-        if opts.buffers == "all" then
-            bufids[curbuf] = nil
-            bufids = M.make_bufferlist(opts)
-        end
-    end
-    opts.bufids = bufids
-
-    return opts
-end
-
 return M
