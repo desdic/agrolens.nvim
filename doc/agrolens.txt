@@ -76,11 +76,11 @@ Usage ~
 
 ==============================================================================
 ------------------------------------------------------------------------------
-                                                       *agrolens.telescope_opts*
-                           `agrolens.telescope_opts`
+                                                                   *config.opts*
+                                 `config.opts`
 Default telescope options:
 >lua
-  agrolens.telescope_opts = {
+  config.opts = {
       -- Enable/Disable debug messages (is put in ~/.cache/nvim/agrolens.log)
       debug = false,
 
