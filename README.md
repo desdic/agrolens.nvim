@@ -27,10 +27,14 @@ Support for fzf requires:
 
 [Fzf-lua](https://github.com/ibhagwan/fzf-lua)
 
+Support for snacks picker requires:
+
+[Snacks](https://github.com/folke/snacks.nvim)
+
 
 # Default options
 
-Options are the same for fzf and telescope they are just added in different places
+Options are the same for fzf, snacks and telescope they are just added in different places
 
 ```lua
 {
@@ -146,6 +150,40 @@ require("telescope").extensions = {
 ```
 </details>
 
+<details><summary>Snacks</summary>
+
+```lua
+{
+    "desdic/agrolens.nvim",
+    opts = {
+        force_long_filepath = true,
+        debug = false,
+        same_type = false,
+        include_hidden_buffers = false,
+        disable_indentation = true,
+        aliases = {
+            yamllist = "docker-compose,github-workflow-steps",
+            work = "cheflxchost,github-workflow-steps,pytest,ipam",
+            all = "cheflxchost,pytest,ipam,functions,labels",
+        },
+    },
+    keys = {
+        {
+            "zu",
+            function()
+                require("agrolens.snacks").run({
+                    query = "functions,labels",
+                    buffers = "all",
+                    same_type = false,
+                })
+            end,
+            desc = "find functions and labels",
+        },
+    },
+}
+```
+
+</details>
 
 # Usage via Telescope
 
