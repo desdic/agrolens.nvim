@@ -1,5 +1,6 @@
 local M = {}
 local core = require("agrolens.core")
+local utils = require("agrolens.utils")
 
 M.run = function(args)
     local opts = {}
@@ -31,12 +32,9 @@ M.run = function(args)
                     fname = vim.fs.basename(b.filename)
                 end
 
-                local text = fname .. ":" .. b.lnum .. ":" .. b.line
-
                 table.insert(items, {
-                    formatted = text,
                     file = b.filename,
-                    text = text,
+                    line = b.line:gsub("^%s+", ""),
                     idx = idx,
                     pos = { tonumber(b.lnum), 0 },
                 })
