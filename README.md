@@ -83,6 +83,9 @@ Options are the same for fzf, snacks and telescope they are just added in differ
 
     -- force long path name even when only a single buffer
     force_long_filepath = false,
+
+    -- Layout for snacks picker
+    snacks_layout = { preview = true },
 }
 ```
 
