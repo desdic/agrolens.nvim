@@ -1,6 +1,5 @@
 local M = {}
 local core = require("agrolens.core")
-local utils = require("agrolens.utils")
 
 M.run = function(args)
     local opts = {}
@@ -26,17 +25,17 @@ M.run = function(args)
 
             local results = core.get_captures(opts)
             for idx, b in ipairs(results) do
-                local fname = b.relfilename
+                local line = b.line:gsub("^%s+", "")
+                local posnumber = tonumber(b.lnum)
 
-                if opts.force_long_filepath ~= true then
-                    fname = vim.fs.basename(b.filename)
-                end
+                local text = b.filename .. ":" .. posnumber .. " " .. line
 
                 table.insert(items, {
                     file = b.filename,
-                    line = b.line:gsub("^%s+", ""),
+                    text = text,
+                    line = line,
                     idx = idx,
-                    pos = { tonumber(b.lnum), 0 },
+                    pos = { posnumber, 0 },
                 })
             end
             return items
@@ -46,7 +45,7 @@ M.run = function(args)
         snacks.picker.pick({
             finder = get_choices,
             title = "Agrolens",
-            layout = { preview = true },
+            layout = opts.snacks_layout,
         })
     end
 end
