@@ -152,17 +152,21 @@ M.generate_jump_list = function(opts)
             local root = trees[1]:root()
 
             for _, capture_name in ipairs(capture_names) do
-                local iter_query = vim.treesitter.query.get(
+                local query = vim.treesitter.query.get(
                     filetype,
                     "agrolens." .. capture_name
                 )
-                if iter_query then
-                    for _, matches, _ in iter_query:iter_matches(root, bufnr) do
-                        for i, _ in pairs(matches) do
-                            local curr_capture_name = iter_query.captures[i]
-                            local lnum, _, _, _ = matches[i]:range()
-                            if curr_capture_name == "agrolens.scope" then
-                                entries[lnum + 1] = true
+
+                if query then
+                    for _, match, _ in query:iter_matches(root, bufnr, 0, -1) do
+                        for id, node in pairs(match) do
+                            local name = query.captures[id]
+                            local lnode = node[1]
+                            if lnode and lnode.start then
+                                local lnum = lnode:start()
+                                if name == "agrolens.scope" then
+                                    entries[lnum + 1] = true
+                                end
                             end
                         end
                     end
