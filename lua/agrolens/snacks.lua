@@ -1,9 +1,9 @@
 local M = {}
-local core = require("agrolens.core")
 
 M.run = function(args)
     local opts = {}
     local cfg = require("agrolens.config").opts
+    local core = require("agrolens.core")
 
     opts = core.sanitize_opts(opts, cfg, args)
 
