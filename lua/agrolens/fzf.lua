@@ -1,9 +1,7 @@
 local fzf = {}
-local core = require("agrolens.core")
 
 local contents = {}
 
-local fzf_lua = require("fzf-lua")
 local builtin = require("fzf-lua.previewer.builtin")
 local fzfpreview = builtin.buffer_or_file:extend()
 
@@ -29,6 +27,7 @@ end
 fzf.run = function(args)
     local opts = {}
     local cfg = require("agrolens.config").opts
+    local core = require("agrolens.core")
 
     opts = core.sanitize_opts(opts, cfg, args)
 
@@ -45,7 +44,7 @@ fzf.run = function(args)
             core.jump_prev(curline, jumplist)
         end
     else
-        fzf_lua.fzf_exec(function(fzf_cb)
+        require("fzf-lua").fzf_exec(function(fzf_cb)
             local results = core.get_captures(opts)
             for _, b in ipairs(results) do
                 local fname = b.relfilename

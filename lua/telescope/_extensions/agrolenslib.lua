@@ -1,11 +1,3 @@
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local actions = require("telescope.actions")
-local conf = require("telescope.config").values
-local utils = require("agrolens.utils")
-local core = require("agrolens.core")
-local entry_display = require("telescope.pickers.entry_display")
-
 local agrolens = {}
 
 agrolens.telescope_opts = require("agrolens.config").opts
@@ -20,7 +12,7 @@ agrolens.entry_maker = function(entry)
     if agrolens.telescope_config.disable_devicons ~= true then
         icon, hl_group = agrolens.devicons.get_icon(
             basename,
-            utils.file_extension(basename),
+            require("agrolens.utils").file_extension(basename),
             { default = false }
         )
         icon_width = 2
@@ -42,7 +34,7 @@ agrolens.entry_maker = function(entry)
         .. ":"
         .. entry.line
 
-    local displayer = entry_display.create({
+    local displayer = require("telescope.pickers.entry_display").create({
         separator = " ",
         items = {
             { width = icon_width },
@@ -72,11 +64,12 @@ agrolens.entry_maker = function(entry)
 end
 
 agrolens.generate_new_finder = function(opts)
+    local core = require("agrolens.core")
     local results = core.get_captures(opts)
 
     agrolens.log.debug("captured", results)
 
-    return finders.new_table({
+    return require("telescope.finders").new_table({
         results = results,
         entry_maker = opts.entry_maker,
     })
@@ -89,11 +82,15 @@ agrolens.run = function(opts)
 
     agrolens.log.debug("Run with options:", opts)
 
+    local core = require("agrolens.core")
+
     opts = core.sanitize_opts(
         opts,
         agrolens.telescope_opts,
         agrolens.telescope_config
     )
+
+    local conf = require("telescope.config").values
 
     if opts.query then
         opts.entry_maker = opts.entry_maker or agrolens.entry_maker
@@ -112,14 +109,18 @@ agrolens.run = function(opts)
                 core.jump_prev(curline, jumplist)
             end
         else
-            pickers
+            require("telescope.pickers")
                 .new(opts, {
                     prompt_title = "Search",
                     finder = agrolens.generate_new_finder(opts),
                     previewer = opts.previewer,
                     sorter = opts.sorter,
                     attach_mappings = function(_, map)
-                        map("i", "<c-space>", actions.to_fuzzy_refine)
+                        map(
+                            "i",
+                            "<c-space>",
+                            require("telescope.actions").to_fuzzy_refine
+                        )
                         return true
                     end,
                 })

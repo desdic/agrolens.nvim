@@ -60,8 +60,6 @@ agrolens.opts = {
 }
 --minidoc_afterlines_end
 
-local ts_utils = require("nvim-treesitter.ts_utils")
-local utils = require("agrolens.utils")
 local empty = vim.tbl_isempty
 local len = vim.tbl_count
 
@@ -78,6 +76,7 @@ local get_field_name = function(node)
 end
 
 local get_parent_nodes_at_cursor = function()
+    local ts_utils = require("nvim-treesitter.ts_utils")
     local node = ts_utils.get_node_at_cursor()
 
     if not node then
@@ -228,6 +227,7 @@ agrolens.add_captures = function(opts, captures, capindex)
 end
 
 agrolens.match_line = function(block, line, captures, capindex)
+    local utils = require("agrolens.utils")
     local pattern = "^%s*"
         .. escape_pattern(utils.ltrim(block.node_text))
         .. "$"
@@ -265,6 +265,7 @@ agrolens.generate = function(opts)
     opts = vim.tbl_deep_extend("force", agrolens.opts, opts or {})
 
     local line = vim.api.nvim_get_current_line()
+    local ts_utils = require("nvim-treesitter.ts_utils")
     local cur_node = ts_utils.get_node_at_cursor()
 
     local root = ts_utils.get_root_for_node(cur_node)
