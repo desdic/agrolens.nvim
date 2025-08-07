@@ -20,10 +20,6 @@ jobs:
             url: https://github.com/neovim/neovim/releases/download/v0.11.3/nvim-linux-x86_64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
-          - os: ubuntu-24.04
-            url: https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux-x86_64.tar.gz
-            manager: sudo apt-get
-            packages: -y make lua-check
     steps:
       - uses: actions/checkout@v4
       - run: date +%F > todays-date
