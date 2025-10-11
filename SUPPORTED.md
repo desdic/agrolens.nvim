@@ -7,6 +7,7 @@
 | c | x | x | x |
 | cpp | x | x | x |
 | glsl | x | x | x |
+| groovy | x | x | x |
 | go | x | x | x |
 | lua | x | x | x
 | php | x | x* | x
