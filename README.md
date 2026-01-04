@@ -11,7 +11,7 @@ Its an extention to telescope that runs pre-defined (or custom) tree-sitter quer
 
 ## Requirements
 
-[Neovim 0.10+](https://github.com/neovim/neovim)
+[Neovim 0.11+](https://github.com/neovim/neovim)
 
 [Nvim tree-sitter](https://github.com/nvim-treesitter/nvim-treesitter)
 
