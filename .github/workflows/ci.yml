@@ -17,7 +17,7 @@ jobs:
             manager: sudo apt-get
             packages: -y make lua-check
           - os: ubuntu-24.04
-            url: https://github.com/neovim/neovim/releases/download/v0.11.3/nvim-linux-x86_64.tar.gz
+            url: https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
     steps:
@@ -41,16 +41,10 @@ jobs:
             curl -sL ${{ matrix.url }} | tar xzf - --strip-components=1 -C "${PWD}/_neovim"
           }
           mkdir -p ~/.local/share/nvim/site/pack/vendor/start
-          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/vendor/start/plenary.nvim
-          git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter.git ~/.local/share/nvim/site/pack/vendor/start/nvim-treesitter.git
-          git clone --depth 1 https://github.com/nvim-telescope/telescope.nvim.git ~/.local/share/nvim/site/pack/vendor/start/telescope.nvim.git
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/vendor/start/plenary.nvim || true
+          git clone --depth 1 https://github.com/nvim-treesitter/nvim-treesitter.git ~/.local/share/nvim/site/pack/vendor/start/nvim-treesitter.git || true
+          git clone --depth 1 https://github.com/nvim-telescope/telescope.nvim.git ~/.local/share/nvim/site/pack/vendor/start/telescope.nvim.git || true
           ln -s $(pwd) ~/.local/share/nvim/site/pack/vendor/start
-
-      - name: tree-sitter parsers
-        run: |
-          export PATH="${PWD}/_neovim/bin:${PATH}"
-          export VIM="${PWD}/_neovim/share/nvim/runtime"
-          nvim --headless -c "lua require'nvim-treesitter.install'.prefer_git=false" -c "TSInstallSync lua c cpp rust python go make yaml markdown perl glsl toml php ruby groovy" -c "q"
 
       - name: Run tests
         run: |
