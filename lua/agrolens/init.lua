@@ -76,17 +76,29 @@ local get_field_name = function(node)
 end
 
 local get_parent_nodes_at_cursor = function()
-    local ts_utils = require("nvim-treesitter.ts_utils")
-    local node = ts_utils.get_node_at_cursor()
+    local parser = vim.treesitter.get_parser(0)
+    if not parser then
+        return nil
+    end
 
+    local tree = parser:parse()[1]
+    if not tree then
+        return nil
+    end
+
+    local root = tree:root()
+
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local row = cursor[1] - 1
+    local col = cursor[2]
+
+    local node = root:named_descendant_for_range(row, col, row, col)
     if not node then
         return nil
     end
 
-    local root = ts_utils.get_root_for_node(node)
-
     local nodes = {}
-    while node ~= nil and node ~= root do
+    while node and node ~= root do
         table.insert(nodes, 1, node)
         node = node:parent()
     end
@@ -265,10 +277,31 @@ agrolens.generate = function(opts)
     opts = vim.tbl_deep_extend("force", agrolens.opts, opts or {})
 
     local line = vim.api.nvim_get_current_line()
-    local ts_utils = require("nvim-treesitter.ts_utils")
-    local cur_node = ts_utils.get_node_at_cursor()
 
-    local root = ts_utils.get_root_for_node(cur_node)
+    -- ---- Tree-sitter setup (replacement for ts_utils) ----
+    local parser = vim.treesitter.get_parser(0)
+    if not parser then
+        return
+    end
+
+    local ts_tree = parser:parse()[1]
+    if not ts_tree then
+        return
+    end
+
+    local root = ts_tree:root()
+
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local row = cursor[1] - 1
+    local col = cursor[2]
+
+    local cur_node = root:named_descendant_for_range(row, col, row, col)
+
+    if not cur_node then
+        return
+    end
+    -- ------------------------------------------------------
+
     local parent = get_parent_nodes_at_cursor()
     local node_match = cur_node:parent()
     local from_node = root
