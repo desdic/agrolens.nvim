@@ -17,7 +17,7 @@ jobs:
             manager: sudo apt-get
             packages: -y make lua-check
           - os: ubuntu-24.04
-            url: https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz
+            url: https://github.com/neovim/neovim/releases/download/v0.12.0/nvim-linux-x86_64.tar.gz
             manager: sudo apt-get
             packages: -y make lua-check
     steps:

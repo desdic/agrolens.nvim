@@ -18,9 +18,21 @@ M.create_entry = function(
     entry.relfilename = relfilename
     entry.bufnr = bufnr
 
+    local v = vim.version()
+    local is_nvim_012 = v.major > 0 or (v.major == 0 and v.minor >= 12)
+
     for i, _ in pairs(matches) do
         local curr_capture_name = iter_query.captures[i]
-        local lnum, from, torow, to = matches[i]:range()
+
+        local lnum, from, torow, to
+
+        if is_nvim_012 then
+            local node = matches[i][1] -- Grab the userdata/node from inside the table
+            lnum, from, torow, to = vim.treesitter.get_node_range(node)
+        else
+            lnum, from, torow, to = matches[i]:range()
+        end
+
         local line_text =
             vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, false)[1]
 
