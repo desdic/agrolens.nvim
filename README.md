@@ -13,8 +13,6 @@ Its an extention to telescope that runs pre-defined (or custom) tree-sitter quer
 
 [Neovim 0.11+](https://github.com/neovim/neovim)
 
-[Nvim tree-sitter](https://github.com/nvim-treesitter/nvim-treesitter)
-
 Language specific tree-sitter support is also needed (Depends on your needs)
 
 Support for telescope requires:
