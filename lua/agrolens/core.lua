@@ -1,7 +1,6 @@
 local M = {}
 
 local utils = require("agrolens.utils")
-local ppath = require("plenary.path")
 local empty = vim.tbl_isempty
 local len = vim.tbl_count
 
@@ -128,12 +127,21 @@ M.add_entries = function(
     return entries
 end
 
+local function make_relative(filepath, cwd)
+    local base = cwd or vim.fn.getcwd()
+    local prefix = base:sub(-1) == "/" and base or base .. "/"
+    if filepath:sub(1, #prefix) == prefix then
+        return filepath:sub(#prefix + 1)
+    end
+    return filepath
+end
+
 M.get_captures = function(opts)
     local entries = {}
 
     for _, bufnr in ipairs(opts.bufids) do
         local buffilename = vim.api.nvim_buf_get_name(bufnr)
-        local relfilename = ppath:new(buffilename):make_relative(opts.cwd)
+        local relfilename = make_relative(buffilename, opts.cwd)
         local filetype = vim.filetype.match({ buf = bufnr })
 
         if filetype and filetype ~= "" then
