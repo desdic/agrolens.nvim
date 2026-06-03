@@ -2,7 +2,9 @@ local M = {}
 
 local utils = require("agrolens.utils")
 local empty = vim.tbl_isempty
-local len = vim.tbl_count
+
+local v = vim.version()
+local is_nvim_012 = v.major > 0 or (v.major == 0 and v.minor >= 12)
 
 M.create_entry = function(
     filename,
@@ -16,9 +18,6 @@ M.create_entry = function(
     entry.filename = filename
     entry.relfilename = relfilename
     entry.bufnr = bufnr
-
-    local v = vim.version()
-    local is_nvim_012 = v.major > 0 or (v.major == 0 and v.minor >= 12)
 
     for i, _ in pairs(matches) do
         local curr_capture_name = iter_query.captures[i]
@@ -223,7 +222,7 @@ M.sanitize_opts = function(opts, telescope_opts, telescope_config)
         for match in opts.match:gmatch("[^,%s]+") do
             local elements = utils.split(match, "=")
 
-            if len(elements) == 1 then
+            if #elements == 1 then
                 table.insert(elements, current_word)
             end
 
@@ -294,23 +293,42 @@ end
 
 M.jump_next = function(curline, jumplist)
     table.sort(jumplist)
-    for _, line in pairs(jumplist) do
+    for _, line in ipairs(jumplist) do
         if line > curline then
             vim.api.nvim_win_set_cursor(0, { line, 0 })
-            break
+            return
         end
     end
 end
 
 M.jump_prev = function(curline, jumplist)
-    table.sort(jumplist, function(a, b)
-        return a > b
-    end)
-    for _, line in pairs(jumplist) do
-        if line < curline then
-            vim.api.nvim_win_set_cursor(0, { line, 0 })
-            break
+    table.sort(jumplist)
+    for i = #jumplist, 1, -1 do
+        if jumplist[i] < curline then
+            vim.api.nvim_win_set_cursor(0, { jumplist[i], 0 })
+            return
         end
     end
 end
+
+M.prepare = function(args)
+    local opts = {}
+    local cfg = require("agrolens.config").opts
+    opts = M.sanitize_opts(opts, cfg, args)
+    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
+    opts = M.get_buffers(opts)
+
+    if opts.jump then
+        local jumplist = M.generate_jump_list(opts)
+        local curline = vim.api.nvim_win_get_cursor(0)[1]
+        if opts.jump == "next" then
+            M.jump_next(curline, jumplist)
+        elseif opts.jump == "prev" then
+            M.jump_prev(curline, jumplist)
+        end
+        return nil
+    end
+    return opts
+end
+
 return M

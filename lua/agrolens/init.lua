@@ -60,8 +60,8 @@ agrolens.opts = {
 }
 --minidoc_afterlines_end
 
+local utils = require("agrolens.utils")
 local empty = vim.tbl_isempty
-local len = vim.tbl_count
 
 local get_field_name = function(node)
     local parent = node:parent()
@@ -99,8 +99,11 @@ local get_parent_nodes_at_cursor = function()
 
     local nodes = {}
     while node and node ~= root do
-        table.insert(nodes, 1, node)
+        nodes[#nodes + 1] = node
         node = node:parent()
+    end
+    for i = 1, math.floor(#nodes / 2) do
+        nodes[i], nodes[#nodes - i + 1] = nodes[#nodes - i + 1], nodes[i]
     end
 
     return nodes
@@ -180,20 +183,21 @@ agrolens.do_closures = function(
     if level > next_level then
         local num = (level - next_level) + 1
 
+        local parts = { content }
         for x = 1, num do
-            content = content .. ")"
+            parts[#parts + 1] = ")"
             if captures[x] then
                 if captures[x] == "@cap" then
-                    content = content
-                        .. " "
+                    parts[#parts + 1] = " "
                         .. captures[x]
                         .. tostring(captureid)
                     captureid = captureid + 1
                 else
-                    content = content .. " " .. captures[x]
+                    parts[#parts + 1] = " " .. captures[x]
                 end
             end
         end
+        content = table.concat(parts)
         count = count - num
     elseif level == next_level then
         if opts.all_captures then
@@ -214,21 +218,22 @@ end
 
 agrolens.end_closures = function(list, captures, count, captureid)
     if count > 0 then
-        local index = len(list)
+        local index = #list
+        local parts = { list[index] }
         for x = 1, count do
-            list[index] = list[index] .. ")"
+            parts[#parts + 1] = ")"
             if captures[x] then
                 if captures[x] == "@cap" then
-                    list[index] = list[index]
-                        .. " "
+                    parts[#parts + 1] = " "
                         .. captures[x]
                         .. tostring(captureid)
                     captureid = captureid + 1
                 else
-                    list[index] = list[index] .. " " .. captures[x]
+                    parts[#parts + 1] = " " .. captures[x]
                 end
             end
         end
+        list[index] = table.concat(parts)
     end
 end
 
@@ -239,7 +244,6 @@ agrolens.add_captures = function(opts, captures, capindex)
 end
 
 agrolens.match_line = function(block, line, captures, capindex)
-    local utils = require("agrolens.utils")
     local pattern = "^%s*"
         .. escape_pattern(utils.ltrim(block.node_text))
         .. "$"
@@ -317,7 +321,7 @@ agrolens.generate = function(opts)
     local list = {}
     local captures = {}
     local count = 0
-    local numnodes = len(tree)
+    local numnodes = #tree
     local captureid = 1
 
     for i, block in ipairs(tree) do

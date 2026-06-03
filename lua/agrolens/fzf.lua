@@ -25,58 +25,40 @@ function fzfpreview.parse_entry(_, entry_str)
 end
 
 fzf.run = function(args)
-    local opts = {}
-    local cfg = require("agrolens.config").opts
     local core = require("agrolens.core")
-
-    opts = core.sanitize_opts(opts, cfg, args)
-
-    opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.uv.cwd()
-    opts = core.get_buffers(opts)
-
-    if opts.jump then
-        local jumplist = core.generate_jump_list(opts)
-        local curline = vim.api.nvim_win_get_cursor(0)[1]
-
-        if opts.jump == "next" then
-            core.jump_next(curline, jumplist)
-        elseif opts.jump == "prev" then
-            core.jump_prev(curline, jumplist)
-        end
-    else
-        require("fzf-lua").fzf_exec(function(fzf_cb)
-            local results = core.get_captures(opts)
-            for _, b in ipairs(results) do
-                local fname = b.relfilename
-
-                if opts.force_long_filepath ~= true then
-                    fname = vim.fs.basename(b.filename)
-                end
-
-                local key = fname .. ":" .. b.lnum .. ":" .. b.line
-                contents[key] = b
-                fzf_cb(key)
-            end
-            fzf_cb()
-        end, {
-            previewer = fzfpreview,
-            prompt = "Agrolens> ",
-            actions = {
-                ["enter"] = {
-                    fn = function(selected)
-                        local entry = contents[selected[1]]
-
-                        core.jump_to_buffer_line(
-                            entry.bufnr,
-                            entry.lnum,
-                            entry.col
-                        )
-                    end,
-                    silent = true,
-                },
-            },
-        })
+    local opts = core.prepare(args)
+    if not opts then
+        return
     end
+
+    require("fzf-lua").fzf_exec(function(fzf_cb)
+        local results = core.get_captures(opts)
+        for _, b in ipairs(results) do
+            local fname = b.relfilename
+
+            if opts.force_long_filepath ~= true then
+                fname = vim.fs.basename(b.filename)
+            end
+
+            local key = fname .. ":" .. b.lnum .. ":" .. b.line
+            contents[key] = b
+            fzf_cb(key)
+        end
+        fzf_cb()
+    end, {
+        previewer = fzfpreview,
+        prompt = "Agrolens> ",
+        actions = {
+            ["enter"] = {
+                fn = function(selected)
+                    local entry = contents[selected[1]]
+
+                    core.jump_to_buffer_line(entry.bufnr, entry.lnum, entry.col)
+                end,
+                silent = true,
+            },
+        },
+    })
 end
 
 return fzf
