@@ -4,7 +4,7 @@
 
 # What is Agrolens
 
-Its an extention to telescope that runs pre-defined (or custom) tree-sitter queries on a buffer (or all buffers) and gives a quick view via telescope.
+Run or generate tree-sitter queries.
 
 [![Agrolens.nvim demo](http://img.youtube.com/vi/qPXj1Egi64Y/0.jpg)](http://www.youtube.com/watch?v=qPXj1Egi64Y "Agrolens.nvim demo")
 
@@ -15,7 +15,7 @@ Its an extention to telescope that runs pre-defined (or custom) tree-sitter quer
 
 Language specific tree-sitter support is also needed (Depends on your needs)
 
-Support for telescope requires:
+Support for telescope requires (*deprecated and will be removed in next version*):
 
 [Telescope](https://github.com/nvim-telescope/telescope.nvim)
 
@@ -124,7 +124,7 @@ Options are the same for fzf, snacks and telescope they are just added in differ
 
 </details>
 
-<details><summary>Telescope</summary>
+<details><summary>Telescope (*deprecated and support will be removed in next version*)</summary>
 
 ```lua
 "desdic/agrolens.nvim"
@@ -186,7 +186,7 @@ require("telescope").extensions = {
 
 </details>
 
-# Usage via Telescope
+# Usage via Telescope (*deprecated and support will be removed in next version*)
 
 ```
 :Telescope agrolens <parameters>
@@ -291,12 +291,7 @@ Default options are:
 | all_captures | boolean | Create a capture group for every possible combination, default false|
 | include_root_node | boolean | include root node, default false |
 
-# Similar plugins
 
-[ziontee113/neo-minimap](https://github.com/ziontee113/neo-minimap)
-
-# Help wanted
-
-I don't use all supported languages and files supported by tree-sitter but if you do and want to contribute please make a MR
+# contributing
 
 See the [CONTRIBUTING](CONTRIBUTING.md) for details.
