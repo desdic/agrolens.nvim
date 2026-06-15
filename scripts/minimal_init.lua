@@ -1,5 +1,5 @@
 vim.opt.runtimepath:append(".")
-vim.cmd([[runtime! plugin/plenary.vim]])
+vim.opt.runtimepath:append("deps/mini.nvim")
 vim.cmd([[runtime! plugin/nvim-treesitter.lua]])
 
 vim.cmd([[au BufRead,BufNewFile *.conf set filetype=hocon]])
@@ -7,6 +7,8 @@ vim.cmd([[au BufRead,BufNewFile *.gleam set filetype=gleam]])
 
 vim.o.swapfile = false
 vim.bo.swapfile = false
+
+require("mini.test").setup()
 
 local parsers = {
     "c",
